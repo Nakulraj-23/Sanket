@@ -1,0 +1,51 @@
+text,expected_redacted,kinds
+my card 4111 1111 1111 1111 was charged twice,my card [CARD] was charged twice,CARD
+card number 4111-1111-1111-1111 please block it,card number [CARD] please block it,CARD
+4111111111111111 is the card that got stolen,[CARD] is the card that got stolen,CARD
+my mastercard 5555 5555 5555 4444 declined at a shop,my mastercard [CARD] declined at a shop,CARD
+amex 3782 822463 10005 not working,amex [CARD] not working,CARD
+visa 4012 8888 8888 1881 shows wrong exchange rate,visa [CARD] shows wrong exchange rate,CARD
+discover 6011 1111 1111 1117 was swallowed by atm,discover [CARD] was swallowed by atm,CARD
+old card 5105 1051 0510 5100 expired,old card [CARD] expired,CARD
+short visa 4222 2222 22222 lost,short visa [CARD] lost,CARD
+virtual card 6500000000000000003 not working,virtual card [CARD] not working,CARD
+write to me at name@example.com about the refund,write to me at [EMAIL] about the refund,EMAIL
+my email is rahul.sharma@example.com please update,my email is [EMAIL] please update,EMAIL
+priya_k+bank@example.co.in is my new email,[EMAIL] is my new email,EMAIL
+send statement to A.B@Example.COM today,send statement to [EMAIL] today,EMAIL
+contact amit@mail.example.org or amit2@example.com,contact [EMAIL] or [EMAIL],EMAIL
+call me on 9812345678 about my transfer,call me on [PHONE] about my transfer,PHONE
+my number is +91 98123 45678,my number is [PHONE],PHONE
+phone +91-9876543210 is linked to the app,phone [PHONE] is linked to the app,PHONE
+reach me at 09812345678 anytime,reach me at [PHONE] anytime,PHONE
+whatsapp 98765 43210 for updates,whatsapp [PHONE] for updates,PHONE
+my uk number +44 7911 123456 is not verified,my uk number [PHONE] is not verified,PHONE
+us phone +1 415 555 2671 cannot receive otp,us phone [PHONE] cannot receive otp,PHONE
+mera number +919876543210 hai,mera number [PHONE] hai,PHONE
+phone 91 9123456789 please call,phone [PHONE] please call,PHONE
+account number 123456789012 was debited,account number [ACCOUNT] was debited,ACCOUNT
+a/c 000123456789 not updated,a/c [ACCOUNT] not updated,ACCOUNT
+acct no: 50100234567891 shows wrong balance,acct no: [ACCOUNT] shows wrong balance,ACCOUNT
+my account 9876543210123 got closed,my account [ACCOUNT] got closed,ACCOUNT
+beneficiary account is 123 4567 8901 2345,beneficiary account is [ACCOUNT],ACCOUNT
+IBAN GB29 NWBK 6016 1331 9268 19 not accepted,IBAN [ACCOUNT] not accepted,ACCOUNT
+mere account 123456789 se paise kate,mere account [ACCOUNT] se paise kate,ACCOUNT
+card 4111 1111 1111 1111 and email me@example.com,card [CARD] and email [EMAIL],CARD;EMAIL
+call 9812345678 or write name@example.com,call [PHONE] or write [EMAIL],PHONE;EMAIL
+"account number 123456789012, phone 9812345678","account number [ACCOUNT], phone [PHONE]",ACCOUNT;PHONE
+card 5555555555554444 and a/c 000123456789 both blocked,card [CARD] and a/c [ACCOUNT] both blocked,CARD;ACCOUNT
+rahul@example.com 98123 45678 card 4012888888881881,[EMAIL] [PHONE] card [CARD],EMAIL;PHONE;CARD
+paid rs 5000 with card 4111111111111111 yesterday at 3 pm,paid rs 5000 with card [CARD] yesterday at 3 pm,CARD
+"mera card 4111 1111 1111 1111 chori ho gaya, call 9812345678","mera card [CARD] chori ho gaya, call [PHONE]",CARD;PHONE
+email ravi@example.com account no 50100234567891 card 3530111333300000,email [EMAIL] account no [ACCOUNT] card [CARD],EMAIL;ACCOUNT;CARD
+my diners card 3056 9309 0259 04 was declined,my diners card [CARD] was declined,CARD
+"i paid rs 5,000 on 12/03/2024 and it is still pending","i paid rs 5,000 on 12/03/2024 and it is still pending",
+order id 4829174650281 has not arrived,order id 4829174650281 has not arrived,
+reference code AB12 shows an error,reference code AB12 shows an error,
+card 4111 1111 1111 1112 fails the checksum so leave it,card 4111 1111 1111 1112 fails the checksum so leave it,
+my pin is 4321 and it got blocked,my pin is 4321 and it got blocked,
+transfer of 15000 rupees on 3 march failed,transfer of 15000 rupees on 3 march failed,
+otp 482913 never arrived,otp 482913 never arrived,
+topped up 2500.50 eur but balance shows 2400.50,topped up 2500.50 eur but balance shows 2400.50,
+reference 20240312 for my complaint,reference 20240312 for my complaint,
+i have 3 cards and 2 accounts but only 1 works,i have 3 cards and 2 accounts but only 1 works,

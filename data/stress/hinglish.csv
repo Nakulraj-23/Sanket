@@ -1,0 +1,61 @@
+text,intent,urgency,script,note
+"mera card chori ho gaya hai, jaldi block karo",lost_or_stolen_card,high,roman,"urgent Hinglish, no word 'lost'"
+kal raat mere account se 5000 kat gaye maine to kuch kharida hi nahi,card_payment_not_recognised,high,roman,"long sentence, amount, 'kat gaye' for debited"
+"atm se paise nikle jo maine nikale hi nahi, pls help",cash_withdrawal_not_recognised,high,roman,SMS-style 'pls'
+mera phone kho gaya hai uss mein banking app hai,lost_or_stolen_phone,high,roman,fraud risk only implied by 'banking app'
+"kisi ne mera card ka number use kiya online, fraud lag raha hai",compromised_card,high,roman,"'fraud' is English, rest Hindi"
+mere account se direct debit kat gaya jo maine authorise nahi kiya,direct_debit_payment_not_recognised,high,roman,English banking terms inside Hindi grammar
+card ATM me fas gaya mashine ne wapas nahi diya,card_swallowed,high,roman,"'fas gaya' = stuck, no word 'swallowed'"
+ek hi payment 2 baar kat gayi bhai,transaction_charged_twice,high,roman,"colloquial 'bhai', number as digit"
+"atm ne kam cash diya, screen pe 10000 tha par 5000 hi mila",wrong_amount_of_cash_received,high,roman,"two amounts, no 'wrong'"
+"mera card kahin gir gaya, plz block kr do",lost_or_stolen_card,high,roman,"'kr' for 'kar', 'plz'; 'gir gaya' = fell"
+"mobile chori hogya, sim bhi gayab, account bachao",lost_or_stolen_phone,high,roman,"'hogya' run together, urgency by tone"
+"ye transaction mera nahi hai, 2300 rs kisi shop me kata",card_payment_not_recognised,high,roman,"'rs' abbreviation, 'kata' for charged"
+"mera naya card abhi tak nahi aaya, 10 din ho gaye",card_arrival,medium,roman,'aaya' not 'arrived'
+card activate kaise karu,activate_my_card,medium,roman,"very short, English verb inside Hindi"
+"pin bhul gaya, change karna hai",change_pin,low,roman,'bhul' misspelling of 'bhool'
+mera pin block ho gaya 3 baar galat dala,pin_blocked,medium,roman,'dala' = entered
+contactless tap kaam nahi kar raha,contactless_not_working,medium,roman,mostly English nouns
+virtual card banana hai kaise bnau,getting_virtual_card,low,roman,'bnau' vowel-less spelling
+"card kab expire hoga, renew chahiye",card_about_to_expire,low,roman,English 'expire' and 'renew'
+"refund abhi tak nahi aaya, 1 hafta ho gaya",Refund_not_showing_up,medium,roman,'hafta' = week
+mujhe order ka refund chahiye kaise milega,request_refund,medium,roman,'mjhe' style variant of mujhe
+"payment decline ho gayi card se, kyu",declined_card_payment,medium,roman,'kyu' short for kyun
+payment pending dikha raha hai kab tak clear hoga,pending_card_payment,medium,roman,'dikha raha' = showing
+transfer fail ho gaya par paisa kat gaya,failed_transfer,medium,roman,two clauses joined by 'par'
+maine paise bheje par samne wale ko nahi mile,transfer_not_received_by_recipient,medium,roman,'samne wale' = the other person
+transfer cancel karna hai jaldi,cancel_transfer,medium,roman,urgent tone but not a fraud intent
+top up nahi ho raha card se,top_up_failed,medium,roman,'top up' split in two words
+cheque deposit kiya balance update nhi hua,balance_not_updated_after_cheque_or_cash_deposit,medium,roman,'nhi' vowel dropped
+neft kitne time me pahunchta hai,transfer_timing,low,roman,"'neft' is an Indian payment rail, not in training data"
+paise kaise receive karu bahar se,receiving_money,low,roman,'bahar se' = from abroad
+cash withdrawal pending dikha raha hai abhi tak,pending_cash_withdrawal,medium,roman,English phrase with Hindi tail
+extra charge kyu laga statement me,extra_charge_on_statement,medium,roman,'laga' = applied
+exchange rate kya chal raha hai aaj ka,exchange_rate,low,roman,'chal raha' = prevailing
+foreign payment me galat exchange rate laga diya,card_payment_wrong_exchange_rate,medium,roman,'galat' = wrong
+atm se nikalne pe charge kyu kata,cash_withdrawal_charge,medium,roman,'nikalne pe' = on withdrawing
+transfer fee kyu li gayi,transfer_fee_charged,medium,roman,passive Hindi 'li gayi'
+"kyc verify nahi ho raha, selfie reject ho rahi",unable_to_verify_identity,medium,roman,'kyc' and 'selfie' not in training data
+mera address change karna hai profile me,edit_personal_details,low,roman,'profile' instead of 'details'
+account band karna hai kaise,terminate_account,medium,roman,'band' = close
+app me login ke liye passcode bhool gaya,passcode_forgotten,medium,roman,'bhool gaya' = forgot
+"मेरा कार्ड चोरी हो गया है, कृपया तुरंत ब्लॉक करें",lost_or_stolen_card,high,devanagari,"Devanagari, formal register"
+मेरे खाते से पैसे कट गए जो मैंने खर्च नहीं किए,card_payment_not_recognised,high,devanagari,"Devanagari, no amount"
+एटीएम ने कार्ड निगल लिया,card_swallowed,high,devanagari,"Devanagari, 'ATM' transliterated"
+मेरा कार्ड अभी तक नहीं पहुंचा,card_arrival,medium,devanagari,"Devanagari, short"
+रिफंड अभी तक नहीं मिला,Refund_not_showing_up,medium,devanagari,English loanword 'refund' in Devanagari
+मेरा ट्रांसफर फेल हो गया लेकिन पैसे कट गए,failed_transfer,medium,devanagari,loanwords 'transfer' and 'fail' in Devanagari
+विनिमय दर क्या है आज की,exchange_rate,low,devanagari,"Sanskritic 'vinimay dar', not 'exchange rate'"
+मैं अपना पता कैसे बदलूं,edit_personal_details,low,devanagari,"'pata' = address, no banking word"
+मेरा फोन खो गया है,lost_or_stolen_phone,high,devanagari,"Devanagari, very short"
+खाता बंद कैसे करें,terminate_account,medium,devanagari,'khata' for account
+"mera card compromised lag raha hai, someone used it online",compromised_card,high,mixed,Hinglish and English in one sentence
+मेरा transaction twice charge हो गया,transaction_charged_twice,high,mixed,Devanagari with Latin words
+"ATM ne wrong amount of cash diya, 2000 kam",wrong_amount_of_cash_received,high,mixed,"English phrase, Hindi 'kam' = less"
+मुझे virtual card chahiye kaise milega,getting_virtual_card,low,mixed,three scripts of grammar in one line
+"my top up kyu pending hai, 2 din se",pending_top_up,medium,mixed,"English start, Hindi middle"
+kya main 16 saal ki age me account khol sakta hu,age_limit,low,mixed,'saal' and 'age' both present
+"क्या India se bahar bhi card chalega, which countries supported",country_support,low,mixed,"Devanagari, Hinglish and English together"
+"direct debit meri permission ke bina hua, unauthorised",direct_debit_payment_not_recognised,high,mixed,British spelling plus Hindi
+"payment declined हो गई, balance hai phir bhi",declined_card_payment,medium,mixed,"Devanagari verb, English noun"
+apple pay setup kaise kare iphone me,apple_pay_or_google_pay,low,mixed,"brand names, 'kare' spelling"
