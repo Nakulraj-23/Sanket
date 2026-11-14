@@ -9,7 +9,8 @@ from sklearn.model_selection import train_test_split
 from sanket.config import Settings
 from sanket.pipeline.clean import clean
 from sanket.pipeline.load import load_raw
-from sanket.pipeline.quality import check_frame, check_splits
+from sanket.pipeline.quality import LEAK_COSINE, check_frame, check_splits
+from sanket.pipeline.similarity import near_duplicates
 from sanket.taxonomy import team_of
 
 
@@ -32,8 +33,10 @@ def build_splits(seed: int = 42) -> tuple[dict[str, pd.DataFrame], dict[str, int
     removed["train_internal_duplicates"] = int(train["text"].duplicated().sum())
     train = train.drop_duplicates("text", keep="first")
     removed["test_internal_duplicates_kept"] = int(test["text"].duplicated().sum())
-    rest_y = train["intent"]
-    main, rest = train_test_split(train, test_size=0.30, stratify=rest_y, random_state=seed)
+    leaked, _ = near_duplicates(test["text"].tolist(), train["text"].tolist(), LEAK_COSINE)
+    removed["train_near_copies_of_test"] = len(leaked)
+    train = train.drop(train.index[leaked])
+    main, rest = train_test_split(train, test_size=0.30, stratify=train["intent"], random_state=seed)
     val, stream = train_test_split(rest, test_size=0.50, stratify=rest["intent"], random_state=seed)
     parts = {"train": main, "val": val, "stream": stream, "test": test}
     return {k: v.sort_values("row_id").reset_index(drop=True) for k, v in parts.items()}, removed

@@ -49,13 +49,13 @@ app me login ke liye passcode bhool gaya,passcode_forgotten,medium,roman,'bhool 
 मैं अपना पता कैसे बदलूं,edit_personal_details,low,devanagari,"'pata' = address, no banking word"
 मेरा फोन खो गया है,lost_or_stolen_phone,high,devanagari,"Devanagari, very short"
 खाता बंद कैसे करें,terminate_account,medium,devanagari,'khata' for account
-"mera card compromised lag raha hai, someone used it online",compromised_card,high,mixed,Hinglish and English in one sentence
+"mera card compromised lag raha hai, someone used it online",compromised_card,high,roman,Hinglish and English in one sentence
 मेरा transaction twice charge हो गया,transaction_charged_twice,high,mixed,Devanagari with Latin words
-"ATM ne wrong amount of cash diya, 2000 kam",wrong_amount_of_cash_received,high,mixed,"English phrase, Hindi 'kam' = less"
+"ATM ne wrong amount of cash diya, 2000 kam",wrong_amount_of_cash_received,high,roman,"English phrase, Hindi 'kam' = less"
 मुझे virtual card chahiye kaise milega,getting_virtual_card,low,mixed,three scripts of grammar in one line
-"my top up kyu pending hai, 2 din se",pending_top_up,medium,mixed,"English start, Hindi middle"
-kya main 16 saal ki age me account khol sakta hu,age_limit,low,mixed,'saal' and 'age' both present
+"my top up kyu pending hai, 2 din se",pending_top_up,medium,roman,"English start, Hindi middle"
+kya main 16 saal ki age me account khol sakta hu,age_limit,low,roman,'saal' and 'age' both present
 "क्या India se bahar bhi card chalega, which countries supported",country_support,low,mixed,"Devanagari, Hinglish and English together"
-"direct debit meri permission ke bina hua, unauthorised",direct_debit_payment_not_recognised,high,mixed,British spelling plus Hindi
+"direct debit meri permission ke bina hua, unauthorised",direct_debit_payment_not_recognised,high,roman,British spelling plus Hindi
 "payment declined हो गई, balance hai phir bhi",declined_card_payment,medium,mixed,"Devanagari verb, English noun"
-apple pay setup kaise kare iphone me,apple_pay_or_google_pay,low,mixed,"brand names, 'kare' spelling"
+apple pay setup kaise kare iphone me,apple_pay_or_google_pay,low,roman,"brand names, 'kare' spelling"
