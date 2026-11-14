@@ -10,7 +10,7 @@ import pytest
 from sanket.config import ROOT, Settings
 from sanket.models.baseline import BaselineModel
 from sanket.models.evaluate import evaluate_frame, load_split
-from sanket.retrain import gate, run_retrain
+from sanket.retrain import best_ever_problems, flip_labels, gate, label_sanity_problems, run_retrain
 from sanket.routing.thresholds import load_thresholds
 
 ART = ROOT / "artifacts"
@@ -99,3 +99,35 @@ def test_clean_retrain_is_not_rejected(scratch_artifacts) -> None:
 
 def test_retrain_needs_enough_reviewed_tickets(scratch_artifacts) -> None:
     assert run_retrain(reviewed_rows(10), min_new=50)["status"] == "skipped"
+
+
+def test_all_wrong_reviews_are_rejected(scratch_artifacts) -> None:
+    bad = flip_labels(load_split("stream").sample(200, random_state=8)[["text", "intent"]], 1.0)
+    result = run_retrain(bad, min_new=50)
+    assert result["promoted"] is False
+    assert any("label sanity" in r for r in result["reasons"])
+    assert json.loads((scratch_artifacts / "registry.json").read_text())["champion"] == "v1"
+
+
+def test_label_sanity_accepts_honest_and_rejects_noisy(champion: dict) -> None:
+    rows = load_split("stream").head(200)[["text", "intent"]]
+    assert label_sanity_problems(champion["model"], rows) == []
+    assert label_sanity_problems(champion["model"], flip_labels(rows, 0.5))
+
+
+def test_best_ever_check_stops_the_slack_ratchet() -> None:
+    reg = {"history": [{"decision": "promoted", "metrics": {"test": {"macro_f1": 0.90}}},
+                       {"decision": "promoted", "metrics": {"test": {"macro_f1": 0.896}}}]}
+    assert best_ever_problems(reg, {"intent_macro_f1": 0.895}) == []
+    assert best_ever_problems(reg, {"intent_macro_f1": 0.885})
+
+
+def test_calibration_in_card(champion: dict) -> None:
+    card = champion["card"]
+    assert 0.3 < card["temperature"] < 1.0 and card["calibration"]["test_ece"] < 0.03
+    assert card["calibration"]["test_high_recall"] >= 0.97
+
+
+def test_duplicate_reviews_do_not_count_as_new(scratch_artifacts) -> None:
+    copies = load_split("train").head(60)[["text", "intent"]]
+    assert run_retrain(copies, min_new=50)["status"] == "skipped"

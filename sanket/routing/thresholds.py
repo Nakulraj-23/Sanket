@@ -54,11 +54,12 @@ def choose_thresholds(proba: np.ndarray, oov: np.ndarray, y_intent: list[str]) -
 
 def save_thresholds(th: Thresholds, directory: Path) -> None:
     """Write thresholds.json next to the model."""
-    payload = {"tau_team": th.tau_team, "tau_high": th.tau_high, "oov_max": th.oov_max}
+    payload = {"tau_team": th.tau_team, "tau_high": th.tau_high, "oov_max": th.oov_max,
+               "oov_conf": th.oov_conf}
     (directory / "thresholds.json").write_text(json.dumps(payload, indent=2), encoding="utf-8")
 
 
 def load_thresholds(directory: Path) -> Thresholds:
     """Read thresholds.json from a model directory."""
     data = json.loads((directory / "thresholds.json").read_text(encoding="utf-8"))
-    return Thresholds(data["tau_team"], data["tau_high"], data["oov_max"])
+    return Thresholds(data["tau_team"], data["tau_high"], data["oov_max"], data.get("oov_conf", 0.98))

@@ -35,8 +35,13 @@ def test_low_team_confidence_goes_to_human() -> None:
 
 
 def test_unfamiliar_words_go_to_human() -> None:
-    d = decide(peaked("card_arrival"), 0.5, TH)
+    d = decide(peaked("card_arrival", 0.6), 0.5, TH)
     assert (d.decision, d.reason) == ("human", "unfamiliar_words")
+
+
+def test_unfamiliar_words_alone_do_not_escalate_a_certain_team() -> None:
+    d = decide(peaked("card_arrival", 0.995), 0.5, TH)
+    assert d.team_conf >= TH.oov_conf and (d.decision, d.reason) == ("auto", "ok")
 
 
 def test_low_confidence_wins_over_unfamiliar_words() -> None:

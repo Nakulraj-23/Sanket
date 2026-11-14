@@ -20,7 +20,8 @@ class Thresholds:
 
     tau_team: float  # below this team confidence, a human looks
     tau_high: float  # at or above this chance of "high urgency", the ticket is high
-    oov_max: float  # above this share of unknown words, a human looks
+    oov_max: float  # above this share of unknown words, a human looks, but only if the team is not clear
+    oov_conf: float = 0.98  # unknown words escalate only when team confidence is below this
 
 
 @dataclass
@@ -62,7 +63,7 @@ def decide(proba: np.ndarray, oov_rate: float, th: Thresholds) -> Decision:
     team_conf = team_probs[team]
     if team_conf < th.tau_team:
         decision, reason = "human", "low_confidence"
-    elif oov_rate > th.oov_max:
+    elif oov_rate > th.oov_max and team_conf < th.oov_conf:
         decision, reason = "human", "unfamiliar_words"
     else:
         decision, reason = "auto", "ok"

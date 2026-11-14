@@ -39,7 +39,10 @@ def build_splits(seed: int = 42) -> tuple[dict[str, pd.DataFrame], dict[str, int
     main, rest = train_test_split(train, test_size=0.30, stratify=train["intent"], random_state=seed)
     val, stream = train_test_split(rest, test_size=0.50, stratify=rest["intent"], random_state=seed)
     parts = {"train": main, "val": val, "stream": stream, "test": test}
-    return {k: v.sort_values("row_id").reset_index(drop=True) for k, v in parts.items()}, removed
+    ordered = {k: v.sort_values("row_id").reset_index(drop=True) for k, v in parts.items()}
+    # The stream is replayed in file order, so shuffle it: any slice is then a fair sample of all intents.
+    ordered["stream"] = ordered["stream"].sample(frac=1, random_state=seed).reset_index(drop=True)
+    return ordered, removed
 
 
 def main() -> None:

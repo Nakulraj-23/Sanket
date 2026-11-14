@@ -37,6 +37,19 @@ def _softmax(scores: np.ndarray) -> np.ndarray:
     return exp / exp.sum(axis=1, keepdims=True)
 
 
+def fit_temperature(scores: np.ndarray, y_intent: list[str]) -> float:
+    """The single number T that minimises log-loss of softmax(scores / T) on validation data."""
+    from scipy.optimize import minimize_scalar
+
+    y = np.array([INTENTS.index(label) for label in y_intent])
+
+    def loss(t: float) -> float:
+        p = _softmax(scores / t)
+        return float(-np.log(p[np.arange(len(y)), y] + 1e-12).mean())
+
+    return float(minimize_scalar(loss, bounds=(0.2, 3.0), method="bounded").x)
+
+
 def _make_vectorizers(p: BaselineParams) -> tuple[TfidfVectorizer, TfidfVectorizer | None]:
     """Word 1-2 grams, and optionally character 2-5 grams inside word edges; both sublinear tf."""
     word = TfidfVectorizer(ngram_range=(1, 2), sublinear_tf=True, min_df=2, max_features=p.max_word,
@@ -52,12 +65,14 @@ class BaselineModel:
     """Implements Classifier. Build one with `BaselineModel.fit`, or load a saved one."""
 
     def __init__(self, version: str, word, char, coef: np.ndarray, intercept: np.ndarray,
-                 dtype=np.float32) -> None:
+                 dtype=np.float32, temperature: float = 1.0) -> None:
         self.version = version
         self.word = word
         self.char = char
         self.coef = coef.astype(dtype)
         self.intercept = intercept.astype(dtype)
+        self.temperature = temperature  # one number fitted on val; below 1 sharpens the probabilities
+        self._weights = np.ascontiguousarray(self.coef.T.astype(np.float64))  # built once, not per call
         self._unigrams = {t for t in word.vocabulary_ if " " not in t}
         self._tokenize = word.build_tokenizer()
         self._names = self._feature_names()
@@ -97,10 +112,13 @@ class BaselineModel:
             blocks.append(self.char.transform(texts))
         return sp.hstack(blocks, format="csr")
 
+    def scores(self, texts: list[str]) -> np.ndarray:
+        """Raw (pre-softmax) scores, shape (n, 77), float64."""
+        return np.asarray(self._features(texts) @ self._weights + self.intercept, dtype=np.float64)
+
     def predict_proba(self, texts: list[str]) -> np.ndarray:
-        """Return shape (n, 77) probabilities in taxonomy.INTENTS order."""
-        scores = self._features(texts) @ self.coef.T.astype(np.float64) + self.intercept
-        return _softmax(np.asarray(scores, dtype=np.float64))
+        """Return shape (n, 77) probabilities in taxonomy.INTENTS order, scores divided by the temperature."""
+        return _softmax(self.scores(texts) / self.temperature)
 
     def explain(self, text: str, intent: str, k: int = 5) -> list[dict]:
         """The k terms that pushed hardest towards `intent`: weight = coefficient x TF-IDF value.
@@ -131,11 +149,12 @@ class BaselineModel:
         """Write model.joblib into `dir`."""
         dir.mkdir(parents=True, exist_ok=True)
         state = {"version": self.version, "word": self.word, "char": self.char,
-                 "coef": self.coef, "intercept": self.intercept}
+                 "coef": self.coef, "intercept": self.intercept, "temperature": self.temperature}
         joblib.dump(state, dir / "model.joblib", compress=3)
 
     @classmethod
     def load(cls, dir: Path) -> "BaselineModel":
         """Read model.joblib from a directory under artifacts/ (never from anywhere else)."""
         s = joblib.load(dir / "model.joblib")
-        return cls(s["version"], s["word"], s["char"], s["coef"], s["intercept"])
+        return cls(s["version"], s["word"], s["char"], s["coef"], s["intercept"],
+                   temperature=s.get("temperature", 1.0))
