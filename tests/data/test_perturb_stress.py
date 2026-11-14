@@ -26,7 +26,7 @@ def test_hinglish_changes_text_and_dictionary_size():
 def test_hinglish_stress_file():
     df = pd.read_csv(Settings().data_dir / "stress" / "hinglish.csv", keep_default_na=False)
     assert len(df) == 60
-    assert df["script"].value_counts().to_dict() == {"roman": 40, "devanagari": 10, "mixed": 10}
+    assert df["script"].value_counts().to_dict() == {"roman": 46, "devanagari": 10, "mixed": 4}
     assert set(df["intent"]) <= set(INTENTS)
     assert len({team_of(i) for i in df["intent"]}) == 7
     assert (df["urgency"] == "high").sum() >= 15

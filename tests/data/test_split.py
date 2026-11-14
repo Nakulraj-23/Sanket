@@ -28,7 +28,7 @@ def test_row_counts_add_up():
     assert len(splits["test"]) == len(raw_test)
     _, removed = build_splits()
     used = sum(len(splits[n]) for n in ("train", "val", "stream"))
-    assert used + removed["train_test_overlap"] + removed["train_internal_duplicates"] == len(raw_train)
+    assert used + removed["train_test_overlap"] + removed["train_internal_duplicates"] + removed["train_near_copies_of_test"] == len(raw_train)
 
 
 def test_ratios_and_every_class_everywhere():

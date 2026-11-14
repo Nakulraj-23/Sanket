@@ -6,8 +6,8 @@ from sanket.pipeline.quality import DataQualityError, check_frame, check_splits
 from sanket.taxonomy import INTENTS
 
 
-def good_frame(per_class: int = 6) -> pd.DataFrame:
-    rows = [(f"{i}-{n}", f"my question number {n} about {i}", i) for i in INTENTS for n in range(per_class)]
+def good_frame(per_class: int = 6, prefix: str = "a") -> pd.DataFrame:
+    rows = [(f"{prefix}-{i}-{n}", f"my question number {n} about {i.lower()}", i) for i in INTENTS for n in range(per_class)]
     return pd.DataFrame(rows, columns=["row_id", "text", "intent"])
 
 
@@ -61,9 +61,24 @@ def test_class_floor_fails():
 
 
 def test_split_overlap_fails():
-    a, b = good_frame(), good_frame()
+    a, b = good_frame(), good_frame(prefix="b")
     b["text"] = b["text"] + " extra"
     check_splits({"a": a, "b": b})
     b.loc[0, "text"] = a.loc[0, "text"]
     with pytest.raises(DataQualityError, match="leak"):
         check_splits({"a": a, "b": b})
+
+
+def test_uncleaned_text_fails():
+    for bad in ("MY QUESTION number about x", "mail me at a@b.com about it", "<br> my question about x"):
+        df = good_frame()
+        df.loc[0, "text"] = bad
+        with pytest.raises(DataQualityError):
+            check_frame(df, "x")
+
+
+def test_duplicate_row_id_fails():
+    df = good_frame()
+    df.loc[1, "row_id"] = df.loc[0, "row_id"]
+    with pytest.raises(DataQualityError, match="row_id"):
+        check_frame(df, "x")
