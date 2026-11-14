@@ -1,0 +1,69 @@
+{
+  "variant": "words_trigrams_d64",
+  "cfg": {
+    "dim": 64,
+    "trigram_buckets": 8192
+  },
+  "vocab_size": 9499,
+  "val_macro_f1": 0.8820054209566163,
+  "epochs": 31,
+  "all_variants": {
+    "words_d64": {
+      "val_macro_f1": 0.8672,
+      "epochs": 33,
+      "seconds": 8.2
+    },
+    "words_trigrams_d64": {
+      "val_macro_f1": 0.882,
+      "epochs": 31,
+      "seconds": 20.5
+    },
+    "words_trigrams_d128": {
+      "val_macro_f1": 0.8759,
+      "epochs": 27,
+      "seconds": 25.4
+    }
+  },
+  "test": {
+    "model": "nn_onnx",
+    "size_mb": 2.507,
+    "intent_accuracy": 0.8857142857142857,
+    "intent_macro_f1": 0.8865056358543172,
+    "team_accuracy": 0.962987012987013,
+    "p50_ms": 0.061450500083992665,
+    "p95_ms": 0.12525775013045856,
+    "throughput_per_s": 35401.35414031657
+  },
+  "bench": [
+    {
+      "model": "baseline",
+      "size_mb": 4.934,
+      "intent_accuracy": 0.9003246753246753,
+      "intent_macro_f1": 0.9003246080958026,
+      "team_accuracy": 0.9685064935064935,
+      "p50_ms": 7.685228500008634,
+      "p95_ms": 8.932276750044819,
+      "throughput_per_s": 5206.707338967367
+    },
+    {
+      "model": "nn_torch",
+      "size_mb": 2.507,
+      "intent_accuracy": 0.8857142857142857,
+      "intent_macro_f1": 0.8865056358543172,
+      "team_accuracy": 0.962987012987013,
+      "p50_ms": 0.10140950007553329,
+      "p95_ms": 0.17397405013070963,
+      "throughput_per_s": 29074.19869532844
+    },
+    {
+      "model": "nn_onnx",
+      "size_mb": 2.507,
+      "intent_accuracy": 0.8857142857142857,
+      "intent_macro_f1": 0.8865056358543172,
+      "team_accuracy": 0.962987012987013,
+      "p50_ms": 0.061450500083992665,
+      "p95_ms": 0.12525775013045856,
+      "throughput_per_s": 35401.35414031657
+    }
+  ]
+}

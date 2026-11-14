@@ -1,0 +1,27 @@
+{
+  "variant": "words_trigrams_d64",
+  "cfg": {
+    "dim": 64,
+    "trigram_buckets": 8192
+  },
+  "vocab_size": 9499,
+  "val_macro_f1": 0.8820054209566163,
+  "epochs": 31,
+  "all_variants": {
+    "words_d64": {
+      "val_macro_f1": 0.8672,
+      "epochs": 33,
+      "seconds": 8.2
+    },
+    "words_trigrams_d64": {
+      "val_macro_f1": 0.882,
+      "epochs": 31,
+      "seconds": 20.5
+    },
+    "words_trigrams_d128": {
+      "val_macro_f1": 0.8759,
+      "epochs": 27,
+      "seconds": 25.4
+    }
+  }
+}
