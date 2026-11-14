@@ -1,0 +1,12 @@
+{
+  "baseline": {
+    "intent": "lost_or_stolen_card",
+    "conf": 0.91,
+    "ms": 2.1
+  },
+  "nn": {
+    "intent": "lost_or_stolen_card",
+    "conf": 0.88,
+    "ms": 1.4
+  }
+}

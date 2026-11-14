@@ -1,0 +1,40 @@
+{
+  "created_at": "2026-11-14T09:30:00",
+  "status": "green",
+  "n_tickets": 500,
+  "model_version": "v1",
+  "indicators": [
+    {
+      "name": "n_tokens",
+      "kind": "ks",
+      "value": 0.05,
+      "p_value": 0.4,
+      "status": "green"
+    },
+    {
+      "name": "oov_rate",
+      "kind": "ks",
+      "value": 0.05,
+      "p_value": 0.5,
+      "status": "green"
+    },
+    {
+      "name": "team_mix",
+      "kind": "psi",
+      "value": 0.03,
+      "p_value": null,
+      "status": "green"
+    }
+  ],
+  "team_mix": {
+    "CARDS": {
+      "reference": 0.25,
+      "live": 0.24
+    },
+    "FRAUD_SECURITY": {
+      "reference": 0.08,
+      "live": 0.08
+    }
+  },
+  "message": "No meaningful change against the reference."
+}

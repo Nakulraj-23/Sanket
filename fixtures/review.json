@@ -1,0 +1,10 @@
+{
+  "ticket_id": 102,
+  "reviewer": "asha",
+  "action": "override",
+  "final_intent": "card_not_working",
+  "final_team": "CARDS",
+  "final_urgency": "medium",
+  "note": "customer wrote in Hinglish",
+  "created_at": "2026-11-14T09:30:00"
+}
