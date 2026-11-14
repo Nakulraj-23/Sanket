@@ -1,0 +1,40 @@
+{
+  "created_at": "2026-11-14T09:30:00",
+  "status": "red",
+  "n_tickets": 500,
+  "model_version": "v1",
+  "indicators": [
+    {
+      "name": "n_tokens",
+      "kind": "ks",
+      "value": 0.34,
+      "p_value": 0.001,
+      "status": "red"
+    },
+    {
+      "name": "oov_rate",
+      "kind": "ks",
+      "value": 0.34,
+      "p_value": 0.001,
+      "status": "red"
+    },
+    {
+      "name": "team_mix",
+      "kind": "psi",
+      "value": 0.41,
+      "p_value": null,
+      "status": "red"
+    }
+  ],
+  "team_mix": {
+    "CARDS": {
+      "reference": 0.25,
+      "live": 0.1
+    },
+    "FRAUD_SECURITY": {
+      "reference": 0.08,
+      "live": 0.3
+    }
+  },
+  "message": "Ticket mix and wording moved a lot; review and consider retraining."
+}

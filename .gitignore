@@ -1,0 +1,11 @@
+.venv
+node_modules
+*.db
+*.db-*
+dist/
+__pycache__/
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+# Only the champion model directory is committed (B2 manages the exception).
+artifacts/models/*

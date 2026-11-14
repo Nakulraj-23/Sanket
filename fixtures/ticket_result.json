@@ -1,0 +1,147 @@
+{
+  "ticket_id": 101,
+  "created_at": "2026-11-14T09:30:00",
+  "status": "auto_routed",
+  "text_redacted": "My card was stolen yesterday, please block it",
+  "prediction": {
+    "intent": "lost_or_stolen_card",
+    "intent_conf": 0.91,
+    "top_intents": [
+      {
+        "intent": "lost_or_stolen_card",
+        "prob": 0.91
+      },
+      {
+        "intent": "card_arrival",
+        "prob": 0.045
+      },
+      {
+        "intent": "card_delivery_estimate",
+        "prob": 0.027
+      },
+      {
+        "intent": "order_physical_card",
+        "prob": 0.009
+      },
+      {
+        "intent": "get_physical_card",
+        "prob": 0.009
+      }
+    ],
+    "team": "FRAUD_SECURITY",
+    "team_conf": 0.97,
+    "team_probs": {
+      "FRAUD_SECURITY": 0.97,
+      "CARDS": 0.03
+    },
+    "urgency": "high",
+    "p_high": 0.95,
+    "decision": "auto",
+    "reason": "ok",
+    "model_version": "v1",
+    "top_terms": [
+      {
+        "term": "stolen",
+        "weight": 1.82
+      },
+      {
+        "term": "card",
+        "weight": 0.74
+      },
+      {
+        "term": "my",
+        "weight": 0.12
+      }
+    ],
+    "latency_ms": 3.4
+  },
+  "trace": [
+    {
+      "stage": "ingest",
+      "ms": 0.1,
+      "summary": "Accepted, 1 problems checked",
+      "detail": {
+        "problems": []
+      }
+    },
+    {
+      "stage": "clean",
+      "ms": 0.4,
+      "summary": "Masked 0 personal item(s)",
+      "detail": {
+        "before_masked": "My card was stolen yesterday, please block it",
+        "after": "My card was stolen yesterday, please block it",
+        "pii": {}
+      }
+    },
+    {
+      "stage": "classify",
+      "ms": 2.9,
+      "summary": "Top intent lost_or_stolen_card",
+      "detail": {
+        "top_intents": [
+          {
+            "intent": "lost_or_stolen_card",
+            "prob": 0.91
+          },
+          {
+            "intent": "card_arrival",
+            "prob": 0.045
+          },
+          {
+            "intent": "card_delivery_estimate",
+            "prob": 0.027
+          },
+          {
+            "intent": "order_physical_card",
+            "prob": 0.009
+          },
+          {
+            "intent": "get_physical_card",
+            "prob": 0.009
+          }
+        ]
+      }
+    },
+    {
+      "stage": "explain",
+      "ms": 0.3,
+      "summary": "3 terms drove the answer",
+      "detail": {
+        "terms": [
+          {
+            "term": "stolen",
+            "weight": 1.82
+          },
+          {
+            "term": "card",
+            "weight": 0.74
+          },
+          {
+            "term": "my",
+            "weight": 0.12
+          }
+        ]
+      }
+    },
+    {
+      "stage": "route",
+      "ms": 0.05,
+      "summary": "auto: ok",
+      "detail": {
+        "team_probs": {
+          "FRAUD_SECURITY": 0.97,
+          "CARDS": 0.03
+        },
+        "p_high": 0.95,
+        "thresholds": {
+          "tau_team": 0.6,
+          "tau_high": 0.3,
+          "oov_max": 0.4
+        },
+        "rule": "human if team_conf < tau_team or oov_rate > oov_max"
+      }
+    }
+  ],
+  "review": null
+}

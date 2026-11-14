@@ -1,0 +1,11 @@
+[
+  {
+    "id": "clean",
+    "title": "Clean",
+    "what": "Masks emails, phones, card and account numbers, then lowercases.",
+    "why": "The model never sees personal data and train and serve text match.",
+    "file": "sanket/pipeline/clean.py",
+    "function": "clean",
+    "code": "def clean(text): ..."
+  }
+]

@@ -1,0 +1,28 @@
+[
+  {
+    "ticket_id": 102,
+    "created_at": "2026-11-14T09:30:00",
+    "status": "needs_review",
+    "text_redacted": "Mera card [CARD] kaam nahi kar raha, mail me at [EMAIL]",
+    "intent": "card_not_working",
+    "team": "CARDS",
+    "urgency": "medium",
+    "intent_conf": 0.38,
+    "team_conf": 0.52,
+    "decision": "human",
+    "reason": "low_confidence"
+  },
+  {
+    "ticket_id": 101,
+    "created_at": "2026-11-14T09:30:00",
+    "status": "auto_routed",
+    "text_redacted": "My card was stolen yesterday, please block it",
+    "intent": "lost_or_stolen_card",
+    "team": "FRAUD_SECURITY",
+    "urgency": "high",
+    "intent_conf": 0.91,
+    "team_conf": 0.97,
+    "decision": "auto",
+    "reason": "ok"
+  }
+]

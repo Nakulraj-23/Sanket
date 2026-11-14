@@ -1,0 +1,23 @@
+{
+  "override_rate_by_team": {
+    "CARDS": 0.08,
+    "FRAUD_SECURITY": 0.03
+  },
+  "auto_share_by_day": [
+    {
+      "day": "2026-11-13",
+      "auto_share": 0.84,
+      "n": 120
+    }
+  ],
+  "latency_by_model": {
+    "baseline": {
+      "p50_ms": 2.1,
+      "p95_ms": 4.0
+    },
+    "nn": {
+      "p50_ms": 1.4,
+      "p95_ms": 2.6
+    }
+  }
+}
