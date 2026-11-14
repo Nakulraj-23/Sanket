@@ -15,7 +15,7 @@ import pandas as pd
 
 from sanket.config import Settings
 from sanket.db import Review, Ticket, make_engine, session_factory
-from sanket.models.baseline import BaselineParams
+from sanket.models.baseline import BaselineModel, BaselineParams
 from sanket.models.evaluate import load_split
 from sanket.models.train_baseline import package_version, write_registry
 from sanket.pipeline.clean import clean
@@ -26,6 +26,8 @@ MACRO_F1_SLACK = 0.005
 HIGH_RECALL_SLACK = 0.01
 MAX_FILE_MB = 10.0
 MAX_TOTAL_MB = 40.0
+MAX_DISAGREEMENT = 0.30  # reviews the champion disagrees with: honest reviews sit near 0.10-0.25
+BEST_EVER_SLACK = 0.01  # slack is measured from the best promoted model too, so it cannot ratchet down
 
 
 def gate(champion: dict, candidate: dict) -> tuple[bool, list[str]]:
@@ -43,6 +45,31 @@ def gate(champion: dict, candidate: dict) -> tuple[bool, list[str]]:
             f"high-urgency recall {candidate['high_recall']:.4f} is more than {HIGH_RECALL_SLACK} below "
             f"champion {champion['high_recall']:.4f}")
     return (not reasons), reasons
+
+
+def label_sanity_problems(champion: BaselineModel, new_rows: pd.DataFrame) -> list[str]:
+    """Reject if the current champion disagrees with more than 30% of the new reviewed labels.
+
+    An honest reviewer overrides the model on hard tickets, so some disagreement is normal;
+    a batch where most labels are wrong looks very different.
+    """
+    if new_rows.empty:
+        return []
+    pred = np.array(INTENTS)[champion.predict_proba(new_rows["text"].tolist()).argmax(axis=1)]
+    rate = float((pred != new_rows["intent"].to_numpy()).mean())
+    if rate > MAX_DISAGREEMENT:
+        return [(f"label sanity: champion disagrees with {rate:.0%} of {len(new_rows)} new reviews "
+                f"(limit {MAX_DISAGREEMENT:.0%})")]
+    return []
+
+
+def best_ever_problems(registry: dict, candidate: dict) -> list[str]:
+    """Candidate test macro-F1 must also be within 0.01 of the best promoted model so far."""
+    scores = [h["metrics"]["test"]["macro_f1"] for h in registry["history"] if h["decision"] == "promoted"]
+    if scores and candidate["intent_macro_f1"] < max(scores) - BEST_EVER_SLACK:
+        return [(f"macro-F1 {candidate['intent_macro_f1']:.4f} is more than {BEST_EVER_SLACK} below "
+                f"best ever {max(scores):.4f}")]
+    return []
 
 
 def size_problems(candidate_dir: Path) -> list[str]:
@@ -111,17 +138,25 @@ def run_retrain(new: pd.DataFrame, min_new: int = 50, sabotage: float = 0.0) -> 
         return {"status": "skipped", "reasons": [f"only {len(new)} reviewed tickets, need {min_new}"]}
     train, val, test = load_split("train"), load_split("val"), load_split("test")
     if sabotage:
-        new, train = flip_labels(new, sabotage), flip_labels(train, sabotage)
+        new = flip_labels(new, sabotage)  # only the new rows: that is what a bad reviewer could do
     frame = build_training_frame(train, new)
+    n_new = len(frame) - len(train)
+    if n_new < min_new:
+        return {"status": "skipped", "reasons": [
+            f"only {n_new} new reviewed tickets after removing duplicates, need {min_new}"]}
     reasons = quality_problems(frame, val, test)
+    champion = BaselineModel.load(art / "models" / registry["champion"])
+    reasons += label_sanity_problems(champion, frame.iloc[len(train):])
     champ_card = json.loads((art / "models" / registry["champion"] / "card.json").read_text())
     params = BaselineParams(**champ_card["params"])
     version = next_version(registry)
     card = package_version(frame, val, params, version, art / "models" / version,
-                           {"retrained_on": {"new_reviewed_rows": len(frame) - len(train)}})
+                           {"retrained_on": {"new_reviewed_rows": n_new}})
     reasons += size_problems(art / "models" / version)
     ok, gate_reasons = gate(champ_card["metrics"]["test"], card["metrics"]["test"])
-    reasons += gate_reasons
+    _, val_reasons = gate(champ_card["metrics"]["val"], card["metrics"]["val"])  # frozen val, same rule
+    reasons += gate_reasons + [f"val: {r}" for r in val_reasons]
+    reasons += best_ever_problems(registry, card["metrics"]["test"])
     promoted = ok and not reasons
     now = datetime.now(UTC).isoformat(timespec="seconds")
     write_registry({"version": version, "created_at": now, "decision": "promoted" if promoted else "rejected",

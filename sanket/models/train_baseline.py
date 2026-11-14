@@ -15,8 +15,8 @@ import pandas as pd
 from sklearn.metrics import f1_score
 
 from sanket.config import Settings
-from sanket.models.baseline import BaselineModel, BaselineParams
-from sanket.models.evaluate import evaluate_all, load_split, score_texts
+from sanket.models.baseline import BaselineModel, BaselineParams, fit_temperature
+from sanket.models.evaluate import evaluate_all, expected_calibration_error, load_split, score_texts
 from sanket.pipeline.clean import clean
 from sanket.routing.thresholds import choose_thresholds, save_thresholds, team_matrix
 from sanket.taxonomy import INTENTS, TEAM_NAMES
@@ -77,6 +77,8 @@ def package_version(train: pd.DataFrame, val: pd.DataFrame, params: BaselinePara
                     out_dir: Path, extra_card: dict | None = None) -> dict:
     """Fit on `train`, choose thresholds on `val`, evaluate, write the directory; return the card."""
     model = BaselineModel.fit(train["text"].tolist(), train["intent"].tolist(), params, version)
+    val_y = val["intent"].tolist()
+    model.temperature = fit_temperature(model.scores(val["text"].tolist()), val_y)
     proba, oov = score_texts(model, val["text"].tolist())
     th = choose_thresholds(proba, oov, val["intent"].tolist())
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -88,7 +90,9 @@ def package_version(train: pd.DataFrame, val: pd.DataFrame, params: BaselinePara
         "version": version, "date": date.today().isoformat(), "code_version": code_version(),
         "model": "TF-IDF word 1-2 grams + char_wb 2-5 grams, multinomial logistic regression, float32",
         "params": {"C": params.C, "use_char": params.use_char}, "n_train": len(train),
-        "thresholds": {"tau_team": th.tau_team, "tau_high": th.tau_high, "oov_max": th.oov_max},
+        "temperature": model.temperature,
+        "thresholds": {"tau_team": th.tau_team, "tau_high": th.tau_high, "oov_max": th.oov_max,
+                       "oov_conf": th.oov_conf},
         "metrics": evaluate_all(model, th),
         "limits": [
             "Team and urgency come from this project's rubric, not from the dataset.",
@@ -98,9 +102,24 @@ def package_version(train: pd.DataFrame, val: pd.DataFrame, params: BaselinePara
         ],
         "model_file_mb": round((out_dir / "model.joblib").stat().st_size / 1e6, 2),
     }
+    card["calibration"] = calibration_summary(model, val, card["metrics"])
     card.update(extra_card or {})
     (out_dir / "card.json").write_text(json.dumps(card, indent=2), encoding="utf-8")
     return card
+
+
+def calibration_summary(model: BaselineModel, val: pd.DataFrame, metrics: dict) -> dict:
+    """ECE on val before (T=1) and after temperature scaling, and the headline test numbers after it."""
+    texts, y = val["text"].tolist(), np.array([INTENTS.index(i) for i in val["intent"]])
+    raw = model.scores(texts)
+    out = {"temperature": model.temperature, "fitted_on": "val (log-loss)"}
+    for name, t in (("val_ece_before", 1.0), ("val_ece_after", model.temperature)):
+        p = np.exp((raw / t) - (raw / t).max(axis=1, keepdims=True))
+        p /= p.sum(axis=1, keepdims=True)
+        out[name] = expected_calibration_error(p.max(axis=1), p.argmax(axis=1) == y)
+    t = metrics["test"]
+    out.update({f"test_{k}": t[k] for k in ("ece", "auto_share", "high_recall", "auto_team_accuracy")})
+    return out
 
 
 def write_registry(entry: dict, champion: str | None) -> None:

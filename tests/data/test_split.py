@@ -47,3 +47,10 @@ def test_build_is_deterministic_and_matches_files():
     for name in NAMES:
         assert first[name].equals(second[name])
         assert first[name].equals(read(name))
+
+
+def test_stream_is_shuffled_so_any_slice_is_representative():
+    stream = read("stream")
+    assert stream["intent"].iloc[:500].nunique() >= 40
+    assert stream["intent"].iloc[-500:].nunique() >= 40
+    assert not stream["row_id"].is_monotonic_increasing
