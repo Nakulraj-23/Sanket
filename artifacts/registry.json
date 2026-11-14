@@ -1,0 +1,18 @@
+{
+  "champion": "v1",
+  "history": [
+    {
+      "version": "v1",
+      "created_at": "2026-11-14T20:11:38+00:00",
+      "decision": "promoted",
+      "reasons": [
+        "first model"
+      ],
+      "metrics": {
+        "test": {
+          "macro_f1": 0.9003246080958026
+        }
+      }
+    }
+  ]
+}

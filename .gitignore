@@ -9,3 +9,4 @@ __pycache__/
 .ruff_cache/
 # Only the champion model directory is committed (B2 manages the exception).
 artifacts/models/*
+!artifacts/models/v1/
