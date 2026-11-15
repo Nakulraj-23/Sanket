@@ -87,13 +87,13 @@ DEV_RE = re.compile(r"[ऀ-ॿ]+")
 def slugify(value: str, separator: str = "-") -> str:
     """Same rule as GitHub's anchors, so the Markdown table of contents also works on GitHub."""
     value = value.replace("`", "").strip().lower()
-    value = re.sub(r"[^\w\- ]", "", value, flags=re.U)
+    value = re.sub(r"[^\w\- ]", "", value, flags=re.UNICODE)
     return value.replace(" ", separator)
 
 
 def split_md(text: str) -> tuple[str, str]:
     """(front matter before the Markdown table of contents, everything after it)."""
-    m = re.search(r"<!-- toc:start -->.*?<!-- toc:end -->\n?", text, flags=re.S)
+    m = re.search(r"<!-- toc:start -->.*?<!-- toc:end -->\n?", text, flags=re.DOTALL)
     if not m:
         raise SystemExit("toc markers not found in the Markdown file")
     return text[: m.start()], text[m.end():]
