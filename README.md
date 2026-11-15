@@ -10,7 +10,10 @@ Every correction is logged, drift is watched, and a new model replaces the old o
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.163-009688)
 ![React](https://img.shields.io/badge/React-18.3-61DAFB)
 ![Tests](https://img.shields.io/badge/pytest-259%20passed-brightgreen)
+[![Live demo](https://img.shields.io/badge/live%20demo-sanket--omega.vercel.app-black?logo=vercel)](https://sanket-omega.vercel.app)
 [![Licence: MIT](https://img.shields.io/badge/licence-MIT-blue)](LICENSE)
+
+**Live demo:** https://sanket-omega.vercel.app (dashboard and API on one free Vercel project). The API is serverless and stateless: each cold start re-seeds a small demo database, so reviews you make may not persist. For a fully reliable showcase use Replay mode or run it locally.
 
 **Live demo:** `https://<your-project>.vercel.app` (dashboard) · `https://<your-user>-sanket.hf.space/api/health` (API)
 — placeholders until you deploy; see [docs/DEPLOY.md](docs/DEPLOY.md).
