@@ -26,7 +26,7 @@ test text (TF-IDF cosine > 0.99). The official test has 1 duplicate text, kept b
   - tr-5576 checkout keeps getting declined = declined_transfer
   - tr-9588 "can i order a new card with the app?" = card_about_to_expire
   - tr-4809 transaction in the app not made by me = direct_debit_payment_not_recognised
-- PII masking is pattern based: a 10-digit amount written after "paid"/"rs"/"amount" is kept, a real phone number written right
+- PII masking is pattern based. Masked classes: [EMAIL] (also written-out forms), [UPI], [PHONE], [CARD] (Luhn), [AADHAAR] (Verhoeff), [PAN], [ACCOUNT] (only near account/IBAN words): a 10-digit amount written after "paid"/"rs"/"amount" is kept, a real phone number written right
   after those words would be too. Hinglish stress rows are hand-written; `hinglishify` output is synthetic, drift demo only.
 
 ## Contested rubric rows (for the candidate to decide; nothing changed)

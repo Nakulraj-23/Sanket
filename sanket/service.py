@@ -20,12 +20,12 @@ from sanket.config import Settings, get_settings
 from sanket.db import Prediction, Review, Ticket, init_db, make_engine, session_factory, utcnow
 from sanket.models.baseline import BaselineModel
 from sanket.pipeline.clean import clean, validate
-from sanket.pipeline.pii import ascii_digits, redact
+from sanket.pipeline.pii import ascii_digits, redact, unify_spaces
 from sanket.routing.decide import Decision, Thresholds, decide
 from sanket.schemas import PredictionOut, TicketResult, TraceStep
 from sanket.taxonomy import INTENTS
 
-PLACEHOLDER = re.compile(r"\[(?:EMAIL|PHONE|CARD|ACCOUNT)\]")
+PLACEHOLDER = re.compile(r"\[(?:EMAIL|UPI|PHONE|CARD|AADHAAR|PAN|ACCOUNT)\]")
 ROUTE_RULE = ("human if team_conf < tau_team; also human if oov_rate > oov_max "
               "and team_conf < oov_conf; otherwise auto")
 
@@ -99,7 +99,7 @@ def mask_with_bullets(raw: str) -> str:
     `redact` returns text with placeholders. We cut the masked text into the pieces between
     placeholders and find those same pieces in the original; what lies between them was masked.
     """
-    norm = ascii_digits(unicodedata.normalize("NFKC", raw))
+    norm = ascii_digits(unicodedata.normalize("NFKC", unify_spaces(raw)))
     masked, _ = redact(norm)
     pieces = PLACEHOLDER.split(masked)
     if len(pieces) == 1:

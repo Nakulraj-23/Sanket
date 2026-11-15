@@ -51,7 +51,6 @@ def test_card_split_by_line_breaks_is_masked(client, sep):
 
 
 
-@pytest.mark.xfail(strict=True, reason="Q3 re-check MED: _ / en-dash / comma between card groups")
 @pytest.mark.parametrize("sep", ["_", "\u2013", ",", " , "])
 def test_card_split_by_punctuation_is_masked(client, sep):
     new_ticket(client, f"card 4012{sep}8888{sep}8888{sep}1881 was stolen")

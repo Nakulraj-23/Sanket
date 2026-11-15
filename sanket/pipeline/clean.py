@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from sanket.pipeline.pii import redact, unify_spaces
 
 MAX_CHARS = 2000
-_PLACEHOLDER = re.compile(r"(\[(?:EMAIL|PHONE|CARD|ACCOUNT)\])")
+_PLACEHOLDER = re.compile(r"(\[(?:EMAIL|UPI|PHONE|CARD|AADHAAR|PAN|ACCOUNT)\])")
 _WORD = re.compile(r"\w+", re.UNICODE)
 
 

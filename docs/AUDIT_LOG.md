@@ -93,3 +93,15 @@
 - Fix: `service.validate_text` refuses text that cannot be encoded (422); /compare uses it too.
 - Not changed: chunked bodies skip the 20 kB header check (text is still limited to 2,000 characters); /health already returns status ok, so the web app can poll it to notice a dead API (B5).
 - DEPLOY.md rewritten with LFS, CORS-after-Vercel, redeploy, local `VITE_API_URL` and troubleshooting.
+
+## 2026-11-15 B1: cards split by punctuation (Q3 re-check MED)
+- Finding: cards with `_`, en/em-dash or comma between groups were stored raw.
+- Evidence: strict xfail `test_card_split_by_punctuation_is_masked` in `tests/api/test_audit_q3.py` (removed).
+- Fix: `CARD_RUN_RE` allows up to 3 non-word characters between digits; separated groups must be 4-8 digits, so amount lists and dates are not read as cards; order/tracking id exception kept.
+- Test: `tests/data/test_audit_pii.py::test_indian_and_punctuation_formats`, `::test_new_classes_do_not_overmask`.
+
+## 2026-11-15 B1: Indian identifiers and obfuscated emails
+- Finding: Aadhaar, PAN, UPI ids and "jane dot doe at example dot com" were not masked.
+- Evidence: Q3 request; none of these appeared in the probe set.
+- Fix: `[AADHAAR]` (12 digits, groups of 4, any separators, Verhoeff checked; chosen because plain 12-digit ids then fail 90% of the time), `[PAN]`, `[UPI]` (name@handle with no dot after it), obfuscated emails become `[EMAIL]` (needs a known top-level domain). `service.py` placeholder list and its `before_masked` step updated to match.
+- Test: probe set now 71 rows (16 negatives); `test_pii.py::test_probe_file_all_rows_match`, `test_verhoeff`, `test_ordinary_email_is_email_not_upi`.
