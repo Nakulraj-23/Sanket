@@ -22,7 +22,7 @@ Terms are in alphabetical order. If you meet a word that is not here, it is a bu
 *Here:* not used in SANKET. The word appears only in the company sheet, because Tech Mahindra's public material uses it.
 
 **AI coding agent.** An AI model that writes and edits code when a person gives it tasks.
-*Here:* SANKET was planned and built with several AI coding agents under the candidate's direction (see the interview guide, question on AI tools).
+*Here:* SANKET was planned and built with several AI coding agents under the author's direction (see `AUTHORS.md`).
 
 **Amber / green / red.** Traffic-light labels for drift: green is stable, amber is worth a look, red is a real shift.
 *Here:* PSI under 0.1 is green, 0.1 to 0.25 amber, above 0.25 red (`drift.py: psi_status`).

@@ -120,9 +120,7 @@ See [docs/data_card.md](docs/data_card.md).
 | [docs/EXPLAIN_LIKE_IM_5.md](docs/EXPLAIN_LIKE_IM_5.md) | The whole system as a post-room story |
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Components, data flow, schema, design decisions |
 | [docs/GLOSSARY.md](docs/GLOSSARY.md) | Every technical term in one plain sentence |
-| [docs/INTERVIEW_GUIDE.md](docs/INTERVIEW_GUIDE.md) ([HTML](docs/INTERVIEW_GUIDE.html)) | Pitch, concepts by hand, 60+ questions, demo script, study plan |
 | [docs/DEPLOY.md](docs/DEPLOY.md) | Run locally, deploy to Hugging Face Spaces and Vercel |
-| [docs/CANDIDATE_HANDBOOK.pdf](docs/CANDIDATE_HANDBOOK.pdf) | **Start here**: the full handbook (what was built, how, every module, testing, JD mapping, 160 interview questions with answers) |
 | [docs/data_card.md](docs/data_card.md) | Data source, splits, caveats |
 | [docs/bench.md](docs/bench.md) | Speed and size benchmark |
 | [docs/EXPERIMENTS.md](docs/EXPERIMENTS.md) | What was tried, including what failed |
