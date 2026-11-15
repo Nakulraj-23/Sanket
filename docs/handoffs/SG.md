@@ -1,0 +1,11 @@
+# SG: SANKET-only study guide (2026-11-15)
+- Made `docs/SANKET_STUDY_GUIDE.md` from `docs/CANDIDATE_HANDBOOK.md`; SANKET numbers, Q&A, code, tests, JD rows unchanged.
+- Removed all PRAHARI content (2.2, 4.2, 5.9, links, pitches, JD cells, 3 stories). Sections 1-11 renumbered by dropping sub-numbers only; Q1-Q160 keep their numbers.
+- Q20 rewritten as "What is SANKET, in one minute?" (from the pitch/plain-words text). Q81, Q82, Q127, Q143, Q157, Q158 lost their PRAHARI sentences.
+- Stories 6-8 now come from `docs/AUDIT_LOG.md` (quality checks missed 8 of 13; test paraphrases in train; ticket cap deleted reviews).
+- JD rating for OOP lowered from partial-to-strong to partial (its evidence was PRAHARI's Check classes).
+- New: section 12 (if PRAHARI is found on GitHub; facts from its README, EXPLAIN_LIKE_IM_5, model card), 5-day SANKET-only plan, section 13 (last 30 minutes).
+- The word PRAHARI appears only in section 12 and in the table-of-contents line that links to it (Markdown TOC, PDF TOC and bookmark).
+- PDF: `.venv/bin/python scripts/build_study_pdf.py`; no JavaScript, no web fonts, no details tags; DejaVu Sans/Mono + FreeSans (Devanagari); all CID TrueType, no Type 3.
+- 56 pages A4, 18 mm margins, footer page numbers, TOC with page numbers, outline and tagged PDF; about 1.7 MB. Noto Devanagari is not installed.
+- Not committed. Section 5.7 got one new row for the new script.
