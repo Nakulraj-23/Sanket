@@ -152,7 +152,8 @@ class CompareOut(BaseModel):
     """POST /compare response."""
 
     baseline: ModelAnswer
-    nn: ModelAnswer
+    nn: ModelAnswer | None = None
+    nn_note: str | None = None
 
 
 class DriftIndicator(BaseModel):

@@ -40,7 +40,7 @@ def health(request: Request) -> Health:
 def stages(request: Request) -> list[Stage]:
     """The seven stages with their real code."""
     rt = request.app.state.runtime
-    return build_stages(rt.card, asdict(rt.thresholds), rt.bench)
+    return build_stages(rt.card, asdict(rt.thresholds), rt.bench, rt.nn is not None)
 
 
 @router.get("/taxonomy", response_model=Taxonomy)
@@ -57,12 +57,17 @@ def compare(body: CompareIn, request: Request) -> CompareOut:
     if problems:
         raise HTTPException(status_code=422, detail="; ".join(problems))
     text = clean(body.text).text
-    answers = {}
-    for name, model in (("baseline", rt.baseline), ("nn", rt.nn)):
+    answers, note = {}, None
+    models = [("baseline", rt.baseline)]
+    if rt.nn is None:
+        note = "The neural network is not available in this deployment."
+    else:
+        models.append(("nn", rt.nn))
+    for name, model in models:
         proba, ms = timed(lambda m=model: m.predict_proba([text])[0])
         best = int(proba.argmax())
         answers[name] = ModelAnswer(intent=INTENTS[best], conf=float(proba[best]), ms=round(ms, 3))
-    return CompareOut(**answers)
+    return CompareOut(**answers, nn_note=note)
 
 
 @router.get("/monitor/drift", response_model=DriftReportOut)

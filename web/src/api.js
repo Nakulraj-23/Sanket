@@ -1,6 +1,12 @@
 // All data access. Two sources only: the live API and public/replay.json.
 // Both return the shapes in docs/plan/CONTRACTS.md.
-const BASE = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '')
+// VITE_API_URL=https://host  -> API on another origin (needs CORS there).
+// VITE_API_URL=/ or VITE_SAME_ORIGIN=1 -> API on this page's own origin under /api (Vercel-only deploy).
+// Unset -> the page still asks /api/health on its own origin and falls back to Replay if that fails.
+const SAME_ORIGIN = import.meta.env.VITE_SAME_ORIGIN === '1' || import.meta.env.VITE_API_URL === '/'
+const BASE = SAME_ORIGIN ? '' : (import.meta.env.VITE_API_URL || '').replace(/\/$/, '')
+// A cold serverless function needs a few seconds to seed its database; give it longer before Replay.
+const HEALTH_TIMEOUT_MS = SAME_ORIGIN ? 12000 : 4000
 
 async function call(method, path, body, timeoutMs = 15000) {
   const ctl = new AbortController()
@@ -32,9 +38,9 @@ function formatDetail(d) {
   return JSON.stringify(d)
 }
 
-/** Health check with a 4-second timeout. Resolves to the health object or throws. */
+/** Health check (4 seconds; 12 for a same-origin build). Resolves to the health object or throws. */
 export async function checkHealth() {
-  const h = await call('GET', '/health', null, 4000)
+  const h = await call('GET', '/health', null, HEALTH_TIMEOUT_MS)
   // A static host may answer /api/health with index.html; only a real health body counts.
   if (!h || h.status !== 'ok') throw new Error('not the API')
   return h

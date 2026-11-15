@@ -43,7 +43,7 @@ class Runtime:
     """Everything loaded once at start-up: models, thresholds, reference, database."""
 
     baseline: BaselineModel
-    nn: object
+    nn: object | None
     thresholds: Thresholds
     reference: dict
     card: dict
@@ -64,10 +64,21 @@ def _read_json(path: Path) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def load_nn(directory: Path):
+    """The ONNX network, or None when onnxruntime or its files are missing (e.g. on Vercel).
+
+    The network is only a benchmarked second opinion; the baseline serves every ticket.
+    """
+    try:
+        from sanket.models.nn.onnx_model import OnnxModel
+
+        return OnnxModel(directory)
+    except (ImportError, OSError):
+        return None
+
+
 def load_runtime(settings: Settings | None = None) -> Runtime:
     """Load the champion from artifacts/registry.json plus the NN, and open the database."""
-    from sanket.models.nn.onnx_model import OnnxModel
-
     st = settings or get_settings()
     registry = _read_json(st.artifacts_dir / "registry.json")
     mdir = st.artifacts_dir / "models" / registry["champion"]
@@ -75,7 +86,7 @@ def load_runtime(settings: Settings | None = None) -> Runtime:
     rows = {r["model"]: r for r in nn_card.get("bench", [])}
     engine = init_db(make_engine(st.db_url))
     return Runtime(
-        baseline=BaselineModel.load(mdir), nn=OnnxModel(st.artifacts_dir / "nn"),
+        baseline=BaselineModel.load(mdir), nn=load_nn(st.artifacts_dir / "nn"),
         thresholds=Thresholds(**_read_json(mdir / "thresholds.json")),
         reference=_read_json(mdir / "reference.json"), card=_read_json(mdir / "card.json"),
         registry=registry, bench={"baseline": rows.get("baseline", {}), "nn": rows.get("nn_onnx", {})},

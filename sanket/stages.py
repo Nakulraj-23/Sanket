@@ -25,7 +25,7 @@ SOURCES = [
 ]
 
 
-def _texts(card: dict, th: dict, bench: dict) -> dict[str, tuple[str, str]]:
+def _texts(card: dict, th: dict, bench: dict, nn_available: bool = True) -> dict[str, tuple[str, str]]:
     """What and why for each stage; the numbers come from the champion card and the benchmark."""
     test = card["metrics"]["test"]
     nn_f1 = bench.get("nn", {}).get("intent_macro_f1", 0.0)
@@ -54,7 +54,9 @@ def _texts(card: dict, th: dict, bench: dict) -> dict[str, tuple[str, str]]:
             f"validation data (temperature {card['temperature']:.2f}) so a 90% answer is right about 90% of the time."),
             (f"On the held-out test set this model scores macro-F1 {test['intent_macro_f1']:.3f}; the "
             f"small neural network in the Compare tab scores {nn_f1:.3f}. The linear model is "
-            "slightly better and fully explainable, so it serves. Both are reported.")),
+            "slightly better and fully explainable, so it serves. Both are reported."
+            + ("" if nn_available else " The neural network is not available in this deployment "
+               "(it needs onnxruntime), so only the recorded score is shown."))),
         "explain": (
             ("For a linear model the explanation is exact. The score of an intent is a sum of "
             "weight times TF-IDF value, one term per word, so we show the five largest terms. "
@@ -96,9 +98,9 @@ def _texts(card: dict, th: dict, bench: dict) -> dict[str, tuple[str, str]]:
     }
 
 
-def build_stages(card: dict, thresholds: dict, bench: dict) -> list[Stage]:
+def build_stages(card: dict, thresholds: dict, bench: dict, nn_available: bool = True) -> list[Stage]:
     """The seven stages with text from EXPLAINABILITY and code read from the real functions."""
-    texts = _texts(card, thresholds, bench)
+    texts = _texts(card, thresholds, bench, nn_available)
     out = []
     for stage_id, title, file, function, obj in SOURCES:
         what, why = texts[stage_id]
