@@ -64,3 +64,34 @@ def test_lone_surrogate_is_dropped():
     result = clean("my card\ud800 is lost\udfff")
     assert result.text == "my card is lost"
     result.text.encode("utf-8")
+
+
+@pytest.mark.parametrize("text,kind", [
+    ("card 4012_8888_8888_1881", "CARD"), ("card 4012,8888,8888,1881", "CARD"), ("card 4012 — 8888 — 8888 — 1881", "CARD"),
+    ("aadhaar 2345-6789-0124", "AADHAAR"), ("aadhaar 2345\n6789\n0124", "AADHAAR"), ("id 234567890124", "AADHAAR"),
+    ("pan ABCDE1234F", "PAN"), ("pan abcde1234f.", "PAN"),
+    ("upi jane@okhdfc", "UPI"), ("upi jane.doe@oksbi", "UPI"), ("upi 9812345678@ybl", "UPI"),
+    ("jane dot doe at example dot com", "EMAIL"), ("jane[at]example[dot]com", "EMAIL"), ("jane (at) example (dot) co (dot) in", "EMAIL"),
+])
+def test_indian_and_punctuation_formats(text, kind):
+    assert kind in clean(text).pii
+
+
+@pytest.mark.parametrize("text", [
+    "order 234567890124 late", "2345 6789 0125 fails the checksum", "paid 15000, 25000, 3000, 4000", "ABCDE12345 and ABCD1234E",
+    "jane@example.com", "meet at home dot", "tracking 4111-1111-1111-1111",
+])
+def test_new_classes_do_not_overmask(text):
+    pii = clean(text).pii
+    assert "UPI" not in pii and "PAN" not in pii and "AADHAAR" not in pii
+    if "example.com" not in text and "tracking" not in text:
+        assert pii == {}
+
+
+def test_ordinary_email_is_email_not_upi():
+    assert clean("jane@example.com").pii == {"EMAIL": 1}
+
+
+def test_verhoeff():
+    from sanket.pipeline.pii import verhoeff_ok
+    assert verhoeff_ok("234567890124") and not verhoeff_ok("234567890125")

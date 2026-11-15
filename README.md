@@ -17,7 +17,7 @@ Every correction is logged, drift is watched, and a new model replaces the old o
 
 ## In plain words
 
-- A message comes in. Card numbers, phone numbers, emails and account numbers become `[CARD]`, `[PHONE]`, `[EMAIL]`, `[ACCOUNT]`.
+- A message comes in. Card numbers, phone numbers, emails and account numbers become `[CARD]`, `[PHONE]`, `[EMAIL]`, `[ACCOUNT]`, plus Aadhaar, PAN and UPI ids as `[AADHAAR]`, `[PAN]`, `[UPI]`.
 - A simple model (word scores times learned weights) picks one of 77 intents, such as `card_arrival` or `lost_or_stolen_card`.
 - It shows the exact words that drove the answer, with numbers that add up.
 - A table that this project wrote maps each intent to one of 7 teams and an urgency.

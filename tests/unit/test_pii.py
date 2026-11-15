@@ -31,7 +31,7 @@ def test_amounts_dates_and_short_codes_stay():
 
 def test_probe_file_all_rows_match():
     df = pd.read_csv(Settings().data_dir / "stress" / "pii_probe.csv", keep_default_na=False)
-    assert len(df) == 50 and (df["kinds"] == "").sum() == 10
+    assert len(df) == 71 and (df["kinds"] == "").sum() == 16
     for row in df.itertuples():
         masked, counts = redact(row.text)
         assert masked == row.expected_redacted, row.text
