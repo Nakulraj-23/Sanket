@@ -15,7 +15,7 @@ test('@live script and HTML in a ticket render as text, never run', async ({ pag
 })
 
 test('@live screenshot of a live result', async ({ page }) => {
-  await page.setViewportSize({ width: 1280, height: 900 })
+  await page.setViewportSize({ width: 1400, height: 900 })
   await page.goto('/')
   await expect(page.getByTestId('mode-badge')).toHaveText('Live')
   await page.getByRole('button', { name: 'Urgent fraud' }).click()
@@ -49,7 +49,7 @@ test('replay: drawer Code tab shows the functions that really run', async ({ pag
 })
 
 test('replay: screenshot with the API stopped', async ({ page }) => {
-  await page.setViewportSize({ width: 1280, height: 900 })
+  await page.setViewportSize({ width: 1400, height: 900 })
   await page.goto('/')
   await expect(page.getByTestId('mode-badge')).toHaveText('Replay')
   await page.getByRole('button', { name: 'Fake PII' }).click()

@@ -22,7 +22,7 @@ app_port: 7860
 pinned: false
 ---
 
-SANKET reads a bank support message, hides personal data, predicts intent, team and urgency,
+SANKET reads a bank support message, masks card numbers, phone numbers and emails by pattern (not names or addresses), predicts intent, team and urgency,
 and sends unsure tickets to a person. This Space runs the API only (`/api/health`, `/api/docs`).
 Set the Space variable `SANKET_CORS_ORIGINS` to the address of the web app.
 """
