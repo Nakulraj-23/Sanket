@@ -56,7 +56,9 @@ def test_thresholds_follow_contract_rules_on_val(model) -> None:
     val = load_split("val")
     proba, oov = score_texts(model, val["text"].tolist())
     assert np.allclose(team_matrix(proba).sum(axis=1), 1.0)
-    assert choose_thresholds(proba, oov, val["intent"].tolist()) == load_thresholds(V1)
+    chosen, saved = choose_thresholds(proba, oov, val["intent"].tolist()), load_thresholds(V1)
+    # oov_conf is picked separately, on a val typo set (see train_baseline.choose_oov_conf)
+    assert (chosen.tau_team, chosen.tau_high, chosen.oov_max) == (saved.tau_team, saved.tau_high, saved.oov_max)
 
 
 def test_ece_matches_hand_computation() -> None:

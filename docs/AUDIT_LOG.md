@@ -49,3 +49,13 @@
 - Fix: unknown words escalate only if team confidence < `oov_conf`. Q2's 0.8 was measured before calibration; after it, 0.8 gave 1.6% silent wrong-team on a val typo set, so `oov_conf` = 0.98 (smallest step on 0.8..0.98 with val-typo silent wrong-team under 1%).
 - Result (test typos 10%): human 38.3%, silent wrong-team 0.55%. Hinglish: 27 of 60 (45%) go to a human, not all 60; 0 silent wrong-team, 1 silent wrong-intent. Clean test auto share 94.2%.
 - Test: `test_routing.py::test_unfamiliar_words_alone_do_not_escalate_a_certain_team`.
+
+## B2 second fix round after Q2 re-check (2026-11-15)
+- Finding: HIGH the 30% champion-disagreement rule rejected honest reviews: on the 85 stream tickets the champion sends to a human, true labels disagree with it 56%.
+- Fix: `label_sanity_problems` now requires at least 75% of new labels to be in the champion's top 5 intents. Honest human-routed batch 0.86, honest random 0.97, 30% noise 0.58 to 0.72, all wrong 0.05. Nearest-train-text agreement was tried first and could not separate honest hard tickets (0.29) from 30% noise on them (0.22).
+- Val gate slack is 0.01 (val is half the size of test); the honest 85-ticket batch scored val F1 0.8914 vs 0.8981 and test 0.9003 -> 0.9052, so 0.005 on val only measured noise. Best-ever check and `--sabotage` (new rows only) kept.
+- Tests: `test_quality_gates.py` accepts human-routed and random true labels, rejects all-wrong and 30% noise (both batch shapes, 3 seeds), promotes the human-routed batch end to end.
+
+- Finding: MED `oov_conf` 0.98 was a hard-coded default.
+- Fix: `train_baseline.choose_oov_conf` picks it on a typo copy of val (seed 1042): smallest human share with silent wrong-team under 1%. Chosen 0.97 (val typos: human 35.6%, silent wrong-team 0.94%); table stored in card.json and `oov_conf` in thresholds.json.
+- Result (test, 10% typos): human 35.4%, silent wrong-team 0.55%; Hinglish 26 of 60 to a human, 0 silent wrong-team (n=60). Test: `test_oov_conf_is_selected_on_val_typos_and_stored`.

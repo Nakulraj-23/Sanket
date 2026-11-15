@@ -23,3 +23,8 @@ Note: first run left torch on its default threads and took over 5 minutes of CPU
 - Tried: `make retrain`-style run from 80 reviewed stream rows, and the same with `--sabotage 0.3`.
 - Result: clean run promoted (test macro-F1 0.9003 -> 0.9016). Sabotaged run rejected twice over: data-quality label agreement 0.526 < 0.72, and test macro-F1 0.8226.
 - Change: the quality check needs a stream frame, so retrain passes stream rows not yet absorbed into train.
+
+## 2026-11-15 B2 label sanity for retraining
+- Tried: nearest-train-text label agreement (TF-IDF 1-NN) as the check on new reviewed labels.
+- Result: random stream rows 0.73 honest vs 0.50 at 30% noise (separable), but the 85 human-routed tickets score 0.29 honest vs 0.22 at 30% noise (not separable). Champion disagreement also failed: 56% on honest human-routed tickets.
+- Change: top-5 coverage of the champion (honest 0.86 to 0.97, 30% noise 0.58 to 0.72, all wrong 0.05), limit 0.75.
