@@ -38,6 +38,25 @@ The container seeds a fresh database at every start, so reviews made on the free
    Preview deployments have other addresses and stay blocked; use the production address.
 5. `VITE_API_URL` is baked in when the page is built. If you change it, redeploy on Vercel.
 
+## Vercel-only deployment (account)
+One Vercel project serves the React dashboard (`web/dist`) and the FastAPI API (`api/index.py`, a Python
+function) on the same origin, so there is no CORS and no separate API host.
+1. Import the GitHub repository into Vercel with the repository root as root directory. `vercel.json` sets the
+   build (`cd web && VITE_SAME_ORIGIN=1 npm run build`, output `web/dist`), the function and the rewrite `/api/*`.
+   `.vercelignore` keeps `.venv`, tests, docs, `data/raw`, the ONNX/torch files and similar out of the upload.
+   Or from the CLI: `vercel --prod` (after `vercel login` and `vercel link`).
+2. Build variable: `VITE_SAME_ORIGIN=1` is already in the build command (`VITE_API_URL=/` means the same). No other variables are needed.
+   Optional runtime variable `SANKET_SEED_TICKETS` (default 250) sets how many demo tickets each cold start seeds.
+3. `requirements.txt` holds serving dependencies only. PyTorch and onnxruntime are not installed, so the neural
+   network is off: `/api/compare` returns `nn: null` with a note and the Classify stage says it is not available in
+   this deployment. The linear champion serves every ticket; benchmark numbers in the model card are unchanged.
+
+Honest limits. A Vercel function is stateless. Each cold start builds a new SQLite database under `/tmp` and
+seeds 250 tickets (the local `make seed` uses 400) in about 1 to 2 seconds after about 2.5 seconds of imports.
+Reviews made on one instance may not appear on another, and they vanish when the instance is recycled. So the
+live review queue here is a demonstration, and Replay mode (recorded answers, `web/public/replay.json`) is the
+reliable showcase. If `/api/health` does not answer within 12 seconds the page shows Replay and retries every 15 seconds.
+
 ## Alternative: Render (account)
 1. New Web Service from the GitHub repository, runtime Docker, the root `Dockerfile`.
 2. Render supplies `PORT`; the Dockerfile uses it. Set `SANKET_CORS_ORIGINS` to the Vercel address.
