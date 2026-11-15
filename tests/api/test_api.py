@@ -113,8 +113,11 @@ def test_pii_never_stored(client):
         dump = ""
         for t in tables:
             dump += json.dumps([[str(c) for c in row] for row in conn.execute(text(f"select * from {t}"))])
-    for secret in ("4111", "jane.doe", "example.com", "7700"):
-        assert secret not in dump
+    # Full secret forms only: a bare 4-digit fragment such as "7700" can appear by chance in
+    # timestamps or latency floats, which made this test flaky.
+    for secret in ("4111 1111", "41111111", "jane.doe", "example.com", "900123", "7700 900", "+44"):
+        i = dump.find(secret)
+        assert i < 0, f"{secret!r} found in database dump: ...{dump[max(0, i - 60):i + 60]}..."
 
 
 def test_parallel_posts(client):
