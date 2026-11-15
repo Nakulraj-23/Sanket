@@ -17,10 +17,6 @@ Every correction is logged, drift is watched, and a new model replaces the old o
 
 **Jump to:** [In plain words](#in-plain-words) · [Screenshots](#screenshots) · [Quickstart](#quickstart-about-2-minutes-on-a-laptop) · [How it works](#how-it-works) · [Results](#results-test-set-3080-official-banking77-test-messages-never-used-for-training-or-tuning) · [Limitations](#honest-limitations) · [Docs](#docs)
 
-
-**Live demo:** `https://<your-project>.vercel.app` (dashboard) · `https://<your-user>-sanket.hf.space/api/health` (API)
-— placeholders until you deploy; see [docs/DEPLOY.md](docs/DEPLOY.md).
-
 ## In plain words
 
 - A message comes in. Card numbers, phone numbers, emails and account numbers become `[CARD]`, `[PHONE]`, `[EMAIL]`, `[ACCOUNT]`, plus Aadhaar, PAN and UPI ids as `[AADHAAR]`, `[PAN]`, `[UPI]`.
