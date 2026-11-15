@@ -37,14 +37,15 @@ def _texts(card: dict, th: dict, bench: dict) -> dict[str, tuple[str, str]]:
             ("Refusing bad input at the door keeps every later step simple. The answer tells the "
             "sender exactly what to fix. Nothing about a refused message is kept.")),
         "clean": (
-            ("Emails, phone numbers, card numbers and account numbers become placeholders such as "
-            "[CARD]. A 16-digit number counts as a card only if it passes the Luhn check, the "
-            "checksum banks use, so an order number is not hidden by mistake. Then the text is "
-            "lower-cased and spaces are tidied, and only this cleaned text is stored."),
-            ("Personal data never reaches the model or the database. Regular patterns can be "
-            "read and tested line by line, which a learned detector cannot offer. The same "
-            "function cleans the training text and the live text, so the model sees the same kind "
-            "of text in both places.")),
+            ("Card numbers, phone numbers, emails (including written-out forms), Aadhaar, PAN and "
+             "UPI ids become placeholders such as [CARD], in the formats we tested. A 16-digit "
+             "number counts as a card only if it passes the Luhn check, the checksum banks use, "
+             "so an order number is not hidden by mistake. Then the text is lower-cased and "
+             "spaces are tidied, and only this cleaned text is stored."),
+            ("The masking is pattern-based. It does not find names, addresses or personal details "
+             "written in ordinary words, and it cannot promise to catch every format. Patterns "
+             "can be read and tested line by line, which a learned detector cannot offer. The "
+             "same function cleans the training text and the live text.")),
         "classify": (
             ("TF-IDF gives each word and short group of letters a score: high if it is frequent "
             "in this message and rare overall. Logistic regression holds one weight per term "

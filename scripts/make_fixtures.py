@@ -106,7 +106,7 @@ def main() -> None:
     write("review", review)
     write("stages", [s.Stage(
         id="clean", title="Clean", what="Masks emails, phones, card and account numbers, then lowercases.",
-        why="The model never sees personal data and train and serve text match.",
+        why="Masks card, phone, email, Aadhaar, PAN and UPI patterns (not names or addresses); train and serve text match.",
         file="sanket/pipeline/clean.py", function="clean", code="def clean(text): ...")])
     write("taxonomy", s.Taxonomy(**taxonomy_payload()))
     write("compare", s.CompareOut(baseline=s.ModelAnswer(intent="lost_or_stolen_card", conf=0.91, ms=2.1),

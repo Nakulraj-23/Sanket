@@ -94,16 +94,33 @@ export function ModelPanel({ api }) {
   useEffect(() => { if (api) api.model().then(setM).catch(() => setM(null)) }, [api])
   if (!m) return <section className="panel" aria-label="Model"><h2>Model</h2><p className="muted">Loading...</p></section>
   const bench = m.bench || {}
-  const keys = [...new Set(Object.values(bench).flatMap((b) => Object.keys(b || {})))]
+  const c = m.champion
+  const val = (c.metrics && c.metrics.val) || {}
+  const test = (c.metrics && c.metrics.test) || {}
+  const th = c.thresholds || {}
+  const f = (v) => (typeof v === 'number' ? v.toFixed(3) : v ?? '-')
+  const keys = ['intent_macro_f1', 'team_accuracy', 'p50_ms', 'size_mb']
   return (
     <section className="panel" aria-label="Model" data-testid="model">
-      <h2>Model {m.champion.version}</h2>
+      <h2>Model {c.version}</h2>
       <table><tbody>
-        {flat(m.champion.metrics).map(([k, v]) => <tr key={k}><td>{k}</td><td>{String(v)}</td></tr>)}
+        <tr><td>Model</td><td>{c.model || '-'}</td></tr>
+        <tr><td>Version, date</td><td>{c.version}, {c.date}</td></tr>
+        <tr><td>Intent macro-F1 (val / test)</td><td>{f(val.intent_macro_f1)} / {f(test.intent_macro_f1)}</td></tr>
+        <tr><td>Team accuracy (val / test)</td><td>{f(val.team_accuracy)} / {f(test.team_accuracy)}</td></tr>
+        <tr><td>High-urgency recall (val / test)</td><td>{f(val.high_recall)} / {f(test.high_recall)}</td></tr>
+        <tr><td>Thresholds</td><td>team {th.tau_team}, urgency {th.tau_high}, unfamiliar {th.oov_max}</td></tr>
+        <tr><td>Temperature T</td><td>{f(c.temperature)}</td></tr>
       </tbody></table>
+      <details>
+        <summary>Full model card</summary>
+        <table><tbody>
+          {flat(c.metrics).filter(([, v]) => typeof v !== 'object').map(([k, v]) => <tr key={k}><td>{k}</td><td>{f(v)}</td></tr>)}
+        </tbody></table>
+      </details>
       <h3>Logistic regression vs neural net</h3>
       <table><thead><tr><th>Measure</th><th>LR</th><th>NN</th></tr></thead><tbody>
-        {keys.map((k) => <tr key={k}><td>{k}</td><td>{bench.baseline ? String(bench.baseline[k] ?? '-') : '-'}</td><td>{bench.nn ? String(bench.nn[k] ?? '-') : '-'}</td></tr>)}
+        {keys.map((k) => <tr key={k}><td>{k}</td><td>{bench.baseline ? f(bench.baseline[k]) : '-'}</td><td>{bench.nn ? f(bench.nn[k]) : '-'}</td></tr>)}
       </tbody></table>
       <h3>Registry history</h3>
       <ul className="list">

@@ -44,3 +44,4 @@ pre { background:#f1f2f6; padding:10px; border-radius:6px; overflow-x:auto; font
 .mono { font-family:ui-monospace, monospace; font-size:13px; } mark { background:#ffe58a; padding:0 3px; border-radius:3px; }
 @media (max-width:900px) { .grid { grid-template-columns:1fr; } .bars li { grid-template-columns:110px 1fr 44px; } }
 .panel { overflow-x:auto; } td, th { overflow-wrap:anywhere; } .page { overflow-x:hidden; }
+.panel .list { max-height:380px; overflow-y:auto; } details summary { cursor:pointer; margin:8px 0; font-size:13px; }
