@@ -9,7 +9,7 @@ Every correction is logged, drift is watched, and a new model replaces the old o
 ![PyTorch](https://img.shields.io/badge/PyTorch-2.15%20(training%20only)-EE4C2C)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.163-009688)
 ![React](https://img.shields.io/badge/React-18.3-61DAFB)
-![Tests](https://img.shields.io/badge/pytest-232%20passed-brightgreen)
+![Tests](https://img.shields.io/badge/pytest-259%20passed-brightgreen)
 [![Licence: MIT](https://img.shields.io/badge/licence-MIT-blue)](LICENSE)
 
 **Live demo:** `https://<your-project>.vercel.app` (dashboard) · `https://<your-user>-sanket.hf.space/api/health` (API)

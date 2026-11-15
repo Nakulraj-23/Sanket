@@ -90,7 +90,7 @@ Each block has: what it does, how, why this way, the file to open, and the one-m
 
 **Open.** `sanket/models/baseline.py: predict_proba, scores`; `sanket/models/nn/net.py: IntentNet.forward`.
 
-**One minute.** "The model turns the text into numbers and the numbers into 77 probabilities. TF-IDF gives each word and short letter group a score: high if it is frequent in this message and rare in general. Logistic regression holds one weight per term per intent. It multiplies scores by weights, adds them up, and softmax turns the 77 totals into probabilities that sum to one. I also built a small PyTorch network: it looks up a 64-number vector for each word, averages them, and passes the average through two layers. On the test set the baseline scores macro-F1 0.900 and the network 0.887. The network is about 15 times faster, 0.055 against 0.82 milliseconds, but both are far below a millisecond. So the linear model serves because it is more accurate and its explanations are exact. I report both."
+**One minute.** "The model turns the text into numbers and the numbers into 77 probabilities. TF-IDF gives each word and short letter group a score: high if it is frequent in this message and rare in general. Logistic regression holds one weight per term per intent. It multiplies scores by weights, adds them up, and softmax turns the 77 totals into probabilities that sum to one. I also built a small PyTorch network: it looks up a 64-number vector for each word, averages them, and passes the average through two layers. On the test set the baseline scores macro-F1 0.900 and the network 0.8865. The network is about 15 times faster, 0.055 against 0.82 milliseconds, but both are far below a millisecond. So the linear model serves because it is more accurate and its explanations are exact. I report both."
 
 ### 3.3 Explain and route
 
@@ -402,7 +402,7 @@ Three network variants were tried, all on validation only (`docs/EXPERIMENTS.md`
 - 0 were silently sent to the wrong team;
 - 1 was silently given the wrong intent in the right team ("top up nahi ho raha card se": the true intent `top_up_failed` became `topping_up_by_card`).
 
-Say "n = 60" every time. With 60 rows, "0 silent wrong-team" still allows a true rate of up to about 9% (Q2's estimate).
+Say "n = 60" every time. Only about 34 of the 60 were routed without a person, and "0 wrong out of about 34" still allows a true error rate of up to about 9% (Q2's 95% bound).
 
 **Typos**: the test set with 10% of characters changed:
 
@@ -462,7 +462,7 @@ The system audit typed a card number, phone and email into a reviewer's note; th
 Now the note and reviewer name go through `redact` before anything is written or returned, and the reviewer name must be 1 to 64 characters.
 Test: `tests/api/test_review_safety.py::test_note_and_reviewer_are_redacted_everywhere`.
 
-**Smaller ones worth knowing.** The stream file was sorted, so its first 500 rows looked like drift (fixed by shuffling). The ticket cap deleted reviewed tickets (now it never does). A broken character gave a 500 (now 422). 68 training rows were near-copies of test rows (removed).
+**Smaller ones worth knowing.** The stream file was sorted, so its first 500 rows looked like drift (fixed by shuffling). The ticket cap deleted reviewed tickets (now it never does). A broken character gave a 500 (now 422). 68 training rows were near-copies of test rows (removed). After the system audit asked for them, Aadhaar (Verhoeff-checked), PAN, UPI ids and written-out emails were added to the masking, with a 71-row probe file.
 
 **Failed experiments (`docs/EXPERIMENTS.md`).** Nearest-training-text label agreement could not separate honest hard tickets (0.29) from noisy ones (0.22), so it was replaced by top-5 coverage. A bigger network (128 numbers per word) scored lower than the 64 version. Training first ran on all CPU threads and took over 5 minutes on tiny matrices; one thread brought all three variants under a minute.
 
@@ -520,7 +520,7 @@ Authentication and reviewer roles; PostgreSQL; a message queue for bursts; strea
 | Monitoring and drift | `sanket/monitoring/drift.py`; override rate in `sanket/sql/metrics.sql` |
 | Feature pipelines, preprocessing | `sanket/pipeline/`; one `clean()` for train and serve |
 | Data reliability | `sanket/pipeline/quality.py`; 422 on bad input |
-| Functional testing of AI components | `tests/` (232 passing), `web/e2e/`, ONNX parity test |
+| Functional testing of AI components | `tests/` (259 passing), `web/e2e/`, ONNX parity test |
 | Performance and latency | `make bench`, `docs/bench.md` |
 | Debugging inference | `docs/AUDIT_LOG.md` (the eight-times speed bug), per-stage timings in the trace |
 | Collaboration with QA | three audit gates, handoff notes, contracts file |
@@ -649,7 +649,7 @@ It calls `/api/health` with a 4-second timeout. If that fails, it loads `web/pub
 `POST /api/tickets` p50 9.9 ms, p95 12.0 ms over 200 requests. Model work alone is about 1 ms; the rest is the database write and the web framework.
 
 #### Q27. How do you know the tests test anything?
-The audits wrote strict "expected to fail" tests for every finding. A fix had to turn them into passing tests. 232 tests pass now, with one known small finding still marked.
+The audits wrote strict "expected to fail" tests for every finding. A fix had to turn them into passing tests. 259 tests pass now, with one known small finding still marked.
 
 #### Q28. What would you do with the overrides?
 Wrong intent → training data. Right intent but disputed urgency → change the table. The override rate per team, from SQL, shows where the model or the table is weakest.

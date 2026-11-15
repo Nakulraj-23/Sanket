@@ -161,7 +161,7 @@ On the official test set it routes 94% of tickets on its own, and 99% of those g
 <p><strong>How.</strong> <strong>TF-IDF</strong> (term frequency times inverse document frequency: a score that is high for a word that is frequent in this message and rare overall) turns the text into numbers. It uses words and pairs of words, plus 2 to 5 letter pieces inside words. <strong>Logistic regression</strong> (a linear model: a weighted sum per class, turned into probabilities) holds one weight per term per intent. The 77 totals go through <strong>softmax</strong> (raise e to each total, divide by the sum) to become probabilities. Finally the totals are divided by a <strong>temperature</strong> of 0.591 so the confidence is honest (section 4.6).</p>
 <p><strong>Why this way.</strong> It is strong on short texts, fast (0.82 ms per ticket at p50) and fully explainable. The challenger, a small PyTorch network, scored lower (section 5.2).</p>
 <p><strong>Open.</strong> <code>sanket/models/baseline.py: predict_proba, scores</code>; <code>sanket/models/nn/net.py: IntentNet.forward</code>.</p>
-<p><strong>One minute.</strong> "The model turns the text into numbers and the numbers into 77 probabilities. TF-IDF gives each word and short letter group a score: high if it is frequent in this message and rare in general. Logistic regression holds one weight per term per intent. It multiplies scores by weights, adds them up, and softmax turns the 77 totals into probabilities that sum to one. I also built a small PyTorch network: it looks up a 64-number vector for each word, averages them, and passes the average through two layers. On the test set the baseline scores macro-F1 0.900 and the network 0.887. The network is about 15 times faster, 0.055 against 0.82 milliseconds, but both are far below a millisecond. So the linear model serves because it is more accurate and its explanations are exact. I report both."</p>
+<p><strong>One minute.</strong> "The model turns the text into numbers and the numbers into 77 probabilities. TF-IDF gives each word and short letter group a score: high if it is frequent in this message and rare in general. Logistic regression holds one weight per term per intent. It multiplies scores by weights, adds them up, and softmax turns the 77 totals into probabilities that sum to one. I also built a small PyTorch network: it looks up a 64-number vector for each word, averages them, and passes the average through two layers. On the test set the baseline scores macro-F1 0.900 and the network 0.8865. The network is about 15 times faster, 0.055 against 0.82 milliseconds, but both are far below a millisecond. So the linear model serves because it is more accurate and its explanations are exact. I report both."</p>
 <h3 id="33-explain-and-route">3.3 Explain and route</h3>
 <p><strong>What.</strong> Shows the words behind the answer, then picks a team, an urgency, and whether a person must look.</p>
 <p><strong>How (explain).</strong> For a linear model, the score of an intent is a sum of (weight × TF-IDF value) over the words in the message, plus an <strong>intercept</strong> (a fixed number per intent). So the five biggest terms are an exact explanation, not an estimate.</p>
@@ -584,7 +584,7 @@ PSI = <strong>0.17</strong> → amber (between 0.1 and 0.25).</p>
 <li>0 were silently sent to the wrong team;</li>
 <li>1 was silently given the wrong intent in the right team ("top up nahi ho raha card se": the true intent <code>top_up_failed</code> became <code>topping_up_by_card</code>).</li>
 </ul>
-<p>Say "n = 60" every time. With 60 rows, "0 silent wrong-team" still allows a true rate of up to about 9% (Q2's estimate).</p>
+<p>Say "n = 60" every time. Only about 34 of the 60 were routed without a person, and "0 wrong out of about 34" still allows a true error rate of up to about 9% (Q2's 95% bound).</p>
 <p><strong>Typos</strong>: the test set with 10% of characters changed:</p>
 <ul>
 <li>intent accuracy 0.817, team accuracy 0.936;</li>
@@ -629,7 +629,7 @@ Test: <code>test_oov_conf_is_selected_on_val_typos_and_stored</code>.</p>
 The system audit typed a card number, phone and email into a reviewer's note; they were stored as typed, in the table and in the database's side file.
 Now the note and reviewer name go through <code>redact</code> before anything is written or returned, and the reviewer name must be 1 to 64 characters.
 Test: <code>tests/api/test_review_safety.py::test_note_and_reviewer_are_redacted_everywhere</code>.</p>
-<p><strong>Smaller ones worth knowing.</strong> The stream file was sorted, so its first 500 rows looked like drift (fixed by shuffling). The ticket cap deleted reviewed tickets (now it never does). A broken character gave a 500 (now 422). 68 training rows were near-copies of test rows (removed).</p>
+<p><strong>Smaller ones worth knowing.</strong> The stream file was sorted, so its first 500 rows looked like drift (fixed by shuffling). The ticket cap deleted reviewed tickets (now it never does). A broken character gave a 500 (now 422). 68 training rows were near-copies of test rows (removed). After the system audit asked for them, Aadhaar (Verhoeff-checked), PAN, UPI ids and written-out emails were added to the masking, with a 71-row probe file.</p>
 <p><strong>Failed experiments (<code>docs/EXPERIMENTS.md</code>).</strong> Nearest-training-text label agreement could not separate honest hard tickets (0.29) from noisy ones (0.22), so it was replaced by top-5 coverage. A bigger network (128 numbers per word) scored lower than the 64 version. Training first ran on all CPU threads and took over 5 minutes on tiny matrices; one thread brought all three variants under a minute.</p>
 <hr />
 <h2 id="7-honest-limitations-and-how-to-say-them">7. Honest limitations and how to say them</h2>
@@ -747,7 +747,7 @@ Test: <code>tests/api/test_review_safety.py::test_note_and_reviewer_are_redacted
 </tr>
 <tr>
 <td>Functional testing of AI components</td>
-<td><code>tests/</code> (232 passing), <code>web/e2e/</code>, ONNX parity test</td>
+<td><code>tests/</code> (259 passing), <code>web/e2e/</code>, ONNX parity test</td>
 </tr>
 <tr>
 <td>Performance and latency</td>
@@ -908,7 +908,7 @@ Test: <code>tests/api/test_review_safety.py::test_note_and_reviewer_are_redacted
 <details class="q" id="q24-how-is-personal-data-handled"><summary>Q24. How is personal data handled?</summary><p>Masked before storage, in the ticket and in reviewer notes. Raw text exists only in memory during the request. The audit checked the database, its side files, the server log and the replay file: zero hits.</p></details>
 <details class="q" id="q25-how-does-the-dashboard-work-without-the-api"><summary>Q25. How does the dashboard work without the API?</summary><p>It calls <code>/api/health</code> with a 4-second timeout. If that fails, it loads <code>web/public/replay.json</code>, which holds recorded real answers, shows an amber Replay badge, and retries in the background.</p></details>
 <details class="q" id="q26-how-long-does-one-request-take"><summary>Q26. How long does one request take?</summary><p><code>POST /api/tickets</code> p50 9.9 ms, p95 12.0 ms over 200 requests. Model work alone is about 1 ms; the rest is the database write and the web framework.</p></details>
-<details class="q" id="q27-how-do-you-know-the-tests-test-anything"><summary>Q27. How do you know the tests test anything?</summary><p>The audits wrote strict "expected to fail" tests for every finding. A fix had to turn them into passing tests. 232 tests pass now, with one known small finding still marked.</p></details>
+<details class="q" id="q27-how-do-you-know-the-tests-test-anything"><summary>Q27. How do you know the tests test anything?</summary><p>The audits wrote strict "expected to fail" tests for every finding. A fix had to turn them into passing tests. 259 tests pass now, with one known small finding still marked.</p></details>
 <details class="q" id="q28-what-would-you-do-with-the-overrides"><summary>Q28. What would you do with the overrides?</summary><p>Wrong intent → training data. Right intent but disputed urgency → change the table. The override rate per team, from SQL, shows where the model or the table is weakest.</p></details>
 <h3 id="b-machine-learning-basics">B. Machine learning basics</h3>
 <details class="q" id="q29-what-is-overfitting-and-how-did-you-limit-it"><summary>Q29. What is overfitting and how did you limit it?</summary><p>The model memorises training data and does worse on new data. Limits: regularisation (C), early stopping for the network, choosing settings on validation, and a frozen test set.</p></details>

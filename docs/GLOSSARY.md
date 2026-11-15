@@ -45,6 +45,9 @@ Terms are in alphabetical order. If you meet a word that is not here, it is a bu
 **Baseline.** The simple model you build first so that fancier models have something to beat.
 *Here:* TF-IDF plus logistic regression in `sanket/models/baseline.py`. It also turned out to be the best model, so it serves.
 
+**Best-ever check.** The retrain gate also compares a candidate with the best model ever promoted, so many small "within tolerance" losses cannot pile up (a "ratchet").
+*Here:* `retrain.py: best_ever_problems`, tolerance 0.01.
+
 **Batch.** A group of examples processed together.
 *Here:* the neural network trains on batches of 64 messages; throughput in `docs/bench.md` is measured with batches of 64.
 
@@ -99,11 +102,14 @@ Terms are in alphabetical order. If you meet a word that is not here, it is a bu
 **Coverage.** The share of tickets the system handles alone at a given confidence cut-off.
 *Here:* at team confidence 0.7, coverage on test is 94.4% (model card, coverage table).
 
-**Cross-entropy (log-loss).** The training penalty: minus the log of the probability the model gave to the right answer. Confident and wrong costs a lot.
+**Cross-entropy (log-loss, NLL).** The training penalty: minus the log of the probability the model gave to the right answer. Confident and wrong costs a lot.
 *Here:* if the right intent got 0.659, the loss is −ln(0.659) = 0.42; if it got 0.090, the loss is 2.41.
 
 **CSV.** A plain text table with commas between columns.
 *Here:* `data/splits/train.csv` with columns `row_id,text,intent`.
+
+**Contract / handoff note / orchestrator.** The contract (`docs/plan/CONTRACTS.md`) fixes file layout, data shapes and API shapes that all agents share; each agent ends with a short handoff note; the orchestrator is the coordinating agent that assigned the work and made the commits.
+*Here:* `docs/handoffs/B0.md` ... `Q3.md`.
 
 **Data card.** A short document that says where data came from, how it was split and what is wrong with it.
 *Here:* `docs/data_card.md`.
@@ -146,6 +152,9 @@ Terms are in alphabetical order. If you meet a word that is not here, it is a bu
 
 **Endpoint.** One URL plus method on an API.
 *Here:* `POST /api/tickets` runs the whole pipeline on one message.
+
+**Entity recogniser (NER).** A trained model that finds names, places and other entities in text.
+*Here:* not used; patterns were chosen because they can be read and tested line by line.
 
 **Environment variable.** A setting passed to a program from outside its code.
 *Here:* every setting in `sanket/config.py` can be changed with `SANKET_<NAME>`, for example `SANKET_DB_URL`.
@@ -249,6 +258,18 @@ Terms are in alphabetical order. If you meet a word that is not here, it is a bu
 **Lint / ruff.** A lint tool reads code and flags style problems and likely bugs; `ruff` is the one used here.
 *Here:* `make lint`.
 
+**Learning rate.** How big a step the training takes each time it adjusts the weights.
+*Here:* 0.002 for the network (`docs/EXPERIMENTS.md`).
+
+**Linear layer.** Multiply a vector by a weight matrix and add a bias: the basic building block of a neural network.
+*Here:* `IntentNet` has two: 64 → 128 and 128 → 77.
+
+**Load balancer.** A front door that spreads requests across several copies of a service.
+*Here:* not used; it is part of the answer to "how would you handle 10,000 tickets a minute?".
+
+**Load test.** Sending many requests at once to see how latency and errors change.
+*Here:* Q3 ran 1, 8 and 32 parallel clients: p95 12.1 ms, 160.4 ms and 719.9 ms, zero errors in 1,400 requests.
+
 **Logistic regression.** A linear model that turns weighted sums into probabilities with softmax (or sigmoid for two classes).
 *Here:* multinomial logistic regression over 77 intents.
 
@@ -263,6 +284,9 @@ Terms are in alphabetical order. If you meet a word that is not here, it is a bu
 
 **Mean pooling.** Average a list of vectors into one vector.
 *Here:* `IntentNet.forward` averages the word vectors, ignoring padding.
+
+**Message queue.** A buffer where incoming work waits until a worker is free, so bursts do not overload a service.
+*Here:* not used; listed under what production would need.
 
 **Middleware.** Code that runs on every request before the endpoint.
 *Here:* `limit_body` in `api/app.py` refuses bodies over 20 kB (413).
@@ -318,6 +342,9 @@ Terms are in alphabetical order. If you meet a word that is not here, it is a bu
 **PII (Personally Identifiable Information).** Data that can identify a person: email, phone, card number, account number, Aadhaar, PAN, UPI id.
 *Here:* masked by `pii.py: redact` before anything is stored.
 
+**PII probe.** A hand-written file of messages with personal data in many formats, and the expected masked text for each.
+*Here:* `data/stress/pii_probe.csv`; `tests/unit/test_pii.py` checks every row.
+
 **Placeholder.** A token that replaces masked data.
 *Here:* `[EMAIL]`, `[UPI]`, `[PHONE]`, `[CARD]`, `[AADHAAR]`, `[PAN]`, `[ACCOUNT]`.
 
@@ -353,6 +380,9 @@ Terms are in alphabetical order. If you meet a word that is not here, it is a bu
 
 **React / Vite.** React builds web pages from components; Vite is the tool that serves and bundles them.
 *Here:* `web/`.
+
+**Rate limit.** A cap on how many requests one client may send per minute.
+*Here:* not built; the 2,000-character limit, 20 kB body limit and 5,000-ticket cap are the current abuse guards.
 
 **Recall.** Of the tickets that truly are X, the share the system caught.
 *Here:* high-urgency recall on test is 0.983.
@@ -390,11 +420,17 @@ Terms are in alphabetical order. If you meet a word that is not here, it is a bu
 **Seed.** A fixed starting number for randomness so results repeat exactly. Also: filling a database with demo data.
 *Here:* seed 42 everywhere; `make seed` fills the database with 400 demo tickets.
 
+**Shortcut (data artefact).** A feature that predicts the label in this dataset for an accidental reason.
+*Here:* the token "1" (as in "£1 charge") appears in 58 of 114 training rows of `extra_charge_on_statement`.
+
 **Selection bias.** A sample that is not representative because of how it was chosen.
 *Here:* only uncertain tickets are reviewed, so the review log says little about easy tickets.
 
 **Silent wrong-team.** A ticket auto-routed (no person) to the wrong team. The worst kind of error, because nobody sees it.
 *Here:* 0.55% of the 10%-typo test set; 0 of 60 Hinglish rows.
+
+**Slack (tolerance).** How much worse a candidate may be and still pass, to allow for random noise.
+*Here:* macro-F1 0.005 and high-urgency recall 0.01 on test (`retrain.py: gate`).
 
 **Softmax.** Turns a list of scores into probabilities: raise e to each score and divide by the total.
 *Here:* scores 2.0, 1.0, 0.1 become 0.659, 0.242, 0.099.
@@ -479,6 +515,9 @@ Terms are in alphabetical order. If you meet a word that is not here, it is a bu
 
 **WAL (Write-Ahead Log).** A SQLite mode that writes changes to a side file first, so reads and writes can overlap.
 *Here:* turned on in `db.py`; Q3 checked that no PII reaches the `-wal` file.
+
+**xfail (strict).** A pytest mark that says "this test is expected to fail". Strict means the suite breaks if it suddenly passes, so the mark must be removed when the bug is fixed.
+*Here:* the auditors wrote strict xfails for each finding; one is left (`test_audit_q2.py`, PSI with a constant reference).
 
 **XSS (cross-site scripting).** An attack where text containing a script runs in someone else's browser.
 *Here:* Q3 submitted `<script>` tickets; the dashboard shows them as plain text.
