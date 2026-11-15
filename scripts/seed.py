@@ -58,7 +58,7 @@ def push_tickets(rt: Runtime, rows: pd.DataFrame) -> dict[int, str]:
 def simulate_reviewer(rt: Runtime, truth: dict[int, str]) -> int:
     """Review all queued tickets but 15, using the true label in memory. Returns reviews made."""
     waiting = queue(rt.sessions, limit=1000)
-    skip = {t.ticket_id for t in random.Random(rt.settings.seed).sample(waiting, LEFT_IN_QUEUE)}
+    skip = {t.ticket_id for t in random.Random(rt.settings.seed).sample(waiting, min(LEFT_IN_QUEUE, len(waiting) // 2))}
     done = 0
     for item in waiting:
         if item.ticket_id in skip:
@@ -80,17 +80,18 @@ def count(rt: Runtime, model, *conditions) -> int:
         return s.scalar(select(func.count()).select_from(model).where(*conditions))
 
 
-def main() -> None:
-    """Build the demo database and print the counts."""
+def main(n_tickets: int = N_TICKETS, rt: Runtime | None = None) -> None:
+    """Build the demo database and print the counts. A passed `rt` must already own an empty database."""
     start = time.perf_counter()
     st = get_settings()
-    remove_old_database(st.db_url)
-    rt = load_runtime(st)
-    stream = pd.read_csv(st.data_dir / "splits" / "stream.csv").head(N_TICKETS)
+    if rt is None:
+        remove_old_database(st.db_url)
+        rt = load_runtime(st)
+    stream = pd.read_csv(st.data_dir / "splits" / "stream.csv").head(n_tickets)
     truth = push_tickets(rt, stream)
     simulate_reviewer(rt, truth)
     report = run_drift(rt)
-    print(f"seeded {N_TICKETS} tickets: auto {count(rt, Ticket, Ticket.status == 'auto_routed')}, "
+    print(f"seeded {n_tickets} tickets: auto {count(rt, Ticket, Ticket.status == 'auto_routed')}, "
           f"queued {count(rt, Ticket, Ticket.status == 'needs_review')}, "
           f"reviewed {count(rt, Review)}, "
           f"overrides {count(rt, Review, Review.action == 'override')}, drift {report.status}, "

@@ -18,7 +18,9 @@ def create_app() -> FastAPI:
 
     @asynccontextmanager
     async def lifespan(app: FastAPI):
-        app.state.runtime = load_runtime()
+        # A host such as Vercel may attach a ready runtime before start-up; keep it.
+        if getattr(app.state, "runtime", None) is None:
+            app.state.runtime = load_runtime()
         yield
 
     settings = get_settings()

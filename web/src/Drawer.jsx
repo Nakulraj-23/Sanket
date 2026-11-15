@@ -46,9 +46,10 @@ function Classify({ detail, result, api }) {
       {cmp && (
         <table><thead><tr><th>Model</th><th>Intent</th><th>Confidence</th><th>Time</th></tr></thead><tbody>
           <tr><td>Baseline</td><td>{cmp.baseline.intent}</td><td>{cmp.baseline.conf}</td><td>{cmp.baseline.ms} ms</td></tr>
-          <tr><td>Neural net</td><td>{cmp.nn.intent}</td><td>{cmp.nn.conf}</td><td>{cmp.nn.ms} ms</td></tr>
+          {cmp.nn && <tr><td>Neural net</td><td>{cmp.nn.intent}</td><td>{cmp.nn.conf}</td><td>{cmp.nn.ms} ms</td></tr>}
         </tbody></table>
       )}
+      {cmp && !cmp.nn && <p className="muted">{cmp.nn_note || 'The neural network is not available in this deployment.'}</p>}
     </>
   )
 }
