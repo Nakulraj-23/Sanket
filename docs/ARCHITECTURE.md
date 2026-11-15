@@ -101,8 +101,9 @@ A ticket goes to a person if team confidence is under 0.70, or if over 20% of it
 *Rejected:* "unknown words always go to a person". Q2 measured that this sent 65% of typo tickets to a person, most of them needlessly.
 
 **5. Personal data is masked with readable patterns, not a learned detector.**
-*Rejected:* an ML entity recogniser. It is heavier, harder to test line by line, and card, phone and email formats are regular.
-Cards must pass the **Luhn** check, so order numbers are not masked by mistake.
+*Rejected:* an ML entity recogniser. It is heavier, harder to test line by line, and card, phone, email, Aadhaar, PAN and UPI formats are regular.
+Cards must pass the **Luhn** check and Aadhaar numbers the **Verhoeff** check, so order numbers are not masked by mistake.
+The cost: names and addresses are not masked.
 
 **6. The frozen test set never enters the live system.**
 Live demo tickets come from a separate `stream` split. Corrections used for retraining therefore cannot leak test rows.
@@ -136,5 +137,5 @@ and this ticket's data. Below the strip: review queue, monitor panel, model pane
 ## What production would need (not built)
 
 Authentication and roles for reviewers; PostgreSQL or another server database; a queue between intake and the model
-for bursts; a byte limit for chunked request bodies; more PII kinds (UPI ids, Aadhaar, PAN); a second test set so the gate
+for bursts; a byte limit for chunked request bodies; masking for names and addresses (patterns cannot catch those); a second test set so the gate
 does not wear out the first; real ticket data with real team and urgency labels; alerting on drift instead of a button.

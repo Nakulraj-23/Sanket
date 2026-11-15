@@ -5,12 +5,19 @@ uses `web/public/replay.json`), so deploy the web app even if the API sleeps. St
 (account) need your own account; I could not run them.
 
 ## Run it on your own machine first (no account)
-1. `make setup data train train-nn seed` (`make link-torch` is only for this sandbox; train needs torch).
+1. `make setup data train seed`. You do not need PyTorch: the neural network's files are already in `artifacts/nn/`.
+   (`make train-nn` retrains that network and does need PyTorch; `make link-torch` only works in the original build sandbox.)
 2. `make serve` starts the API on http://localhost:8000. After `make retrain` promotes a model,
    restart it: the API loads the champion once at start-up.
-3. In another terminal: `cd web && npm install && VITE_API_URL=http://localhost:8000 npm run dev`.
-   Without `VITE_API_URL` the page is always in Replay mode. `make web` does the same without the variable.
+3. In another terminal: `cd web && npm install` (once), then `VITE_API_URL=http://localhost:8000 make web`.
+   Open http://localhost:5173. Without `VITE_API_URL` the page is always in Replay mode (recorded answers).
 4. `make replay` rewrites `web/public/replay.json` from the real pipeline.
+
+## 0. Put the code on GitHub (account)
+1. Create an empty repository on github.com (no README), for example `sanket`.
+2. In the project folder: `git remote add origin https://github.com/<you>/sanket.git && git push -u origin main`
+   (skip `remote add` if `git remote -v` already shows it).
+3. Open the repository's Actions tab: the `ci` workflow should run and turn green.
 
 ## 1. API on Hugging Face Spaces (account)
 1. `make space-bundle` writes `dist/space/` (Dockerfile, Space `README.md` with `sdk: docker`, `app_port: 7860`).

@@ -315,11 +315,11 @@ Terms are in alphabetical order. If you meet a word that is not here, it is a bu
 **Parity test.** A test that two versions of the same model give the same output.
 *Here:* PyTorch and ONNX outputs agree within 1e-4 on 200 validation texts.
 
-**PII (Personally Identifiable Information).** Data that can identify a person: email, phone, card number, account number.
+**PII (Personally Identifiable Information).** Data that can identify a person: email, phone, card number, account number, Aadhaar, PAN, UPI id.
 *Here:* masked by `pii.py: redact` before anything is stored.
 
 **Placeholder.** A token that replaces masked data.
-*Here:* `[EMAIL]`, `[PHONE]`, `[CARD]`, `[ACCOUNT]`.
+*Here:* `[EMAIL]`, `[UPI]`, `[PHONE]`, `[CARD]`, `[AADHAAR]`, `[PAN]`, `[ACCOUNT]`.
 
 **Playwright.** A tool that drives a real browser for tests and screenshots.
 *Here:* `web/e2e/` and the screenshots in `docs/screens/`.
@@ -470,6 +470,12 @@ Terms are in alphabetical order. If you meet a word that is not here, it is a bu
 
 **Vocabulary.** The list of terms the model knows.
 *Here:* the word vectoriser's vocabulary decides what counts as an unfamiliar word.
+
+**Verhoeff checksum.** A check-digit rule, stronger than Luhn, that Aadhaar numbers satisfy.
+*Here:* `pii.py: verhoeff_ok`; a 12-digit number is masked as `[AADHAAR]` only if it passes.
+
+**UPI id.** An Indian payment address like `name@okaxis`.
+*Here:* masked as `[UPI]`; an ordinary email (with a dot after the @ part) stays `[EMAIL]`.
 
 **WAL (Write-Ahead Log).** A SQLite mode that writes changes to a side file first, so reads and writes can overlap.
 *Here:* turned on in `db.py`; Q3 checked that no PII reaches the `-wal` file.

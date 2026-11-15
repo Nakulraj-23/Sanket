@@ -29,9 +29,7 @@ Every correction is logged, drift is watched, and a new model replaces the old o
 
 | Live (API running) | Replay (API asleep, recorded answers) |
 |---|---|
-| ![Live mode](docs/screens/live_top.png) | ![Replay mode](docs/screens/replay_top.png) |
-
-Full-page captures: [live.png](docs/screens/live.png), [replay.png](docs/screens/replay.png).
+| <img src="docs/screens/live.png" alt="Live mode, full page" width="420"> | <img src="docs/screens/replay.png" alt="Replay mode, full page" width="420"> |
 
 ## Quickstart (about 2 minutes on a laptop)
 
@@ -109,7 +107,7 @@ See [docs/data_card.md](docs/data_card.md).
 - **Calibration shares data.** Temperature and thresholds were both chosen on the validation set.
 - **One test set, reused.** The retrain gate scores every candidate on the same test set; over many rounds that slowly overfits it.
 - **Review data is biased.** Only uncertain tickets are reviewed.
-- **PII patterns have gaps.** UPI ids, Aadhaar, PAN and "name at gmail dot com" are not masked.
+- **PII masking is pattern-based.** Email, UPI, phone, card (Luhn), Aadhaar (Verhoeff), PAN and account numbers are masked; names, addresses and any format without a pattern are not.
 - **Not production-hardened.** SQLite, no login, chunked request bodies skip the 20 kB size check, and free hosting sleeps and wipes its disk.
 - **Docker image not verified** (no Docker daemon in the build sandbox). Deployment steps need your own GitHub, Hugging Face and Vercel accounts.
 

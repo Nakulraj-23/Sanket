@@ -51,14 +51,14 @@ Say this only in this form. Do not claim any knowledge of Tech Mahindra's intern
 
 | Link | What to check on the page |
 |---|---|
-| https://insights.techmahindra.com/assets/next-generation-service-desk-solution-for-smarter-support.pdf | Does it describe an AI-assisted service desk? Does it mention ticket classification or routing? |
-| https://techmahindra.com/node/2617 | What the page is about (the plan expected "agentAssistX", IT support automation). |
-| https://insights.techmahindra.com/assets/nps-boost-with-ai-enabled-contact-center-operations.pdf | Who the client is, and whether complaint handling is described. |
-| https://insights.techmahindra.com/assets/redefining-intelligent-banking-with-agentic-ai.pdf | What it says about AI in banking and about human oversight. |
-| https://www.techmahindra.com/insights/press-releases/tech-mahindra-unveils-techm-orion/ | What TechM Orion is; any sentence on guardrails or human oversight. |
-| https://www.techmahindra.com/services/artificial-intelligence/verifai/ | What VerifAI checks (AI validation and testing?). |
-| https://www.techmahindra.com/insights/press-releases/tech-mahindra-launches-project-indus-large-language-model-llm/ | Project Indus and the Indian languages it covers. |
-| https://india.entrepreneur.com/technology/tech-mahindra-increases-ai-investment-in-fy26-working-on/498829 | Context only: AI investment news. |
+| <https://insights.techmahindra.com/assets/next-generation-service-desk-solution-for-smarter-support.pdf> | Does it describe an AI-assisted service desk? Does it mention ticket classification or routing? |
+| <https://techmahindra.com/node/2617> | What the page is about (the plan expected "agentAssistX", IT support automation). |
+| <https://insights.techmahindra.com/assets/nps-boost-with-ai-enabled-contact-center-operations.pdf> | Who the client is, and whether complaint handling is described. |
+| <https://insights.techmahindra.com/assets/redefining-intelligent-banking-with-agentic-ai.pdf> | What it says about AI in banking and about human oversight. |
+| <https://www.techmahindra.com/insights/press-releases/tech-mahindra-unveils-techm-orion/> | What TechM Orion is; any sentence on guardrails or human oversight. |
+| <https://www.techmahindra.com/services/artificial-intelligence/verifai/> | What VerifAI checks (AI validation and testing?). |
+| <https://www.techmahindra.com/insights/press-releases/tech-mahindra-launches-project-indus-large-language-model-llm/> | Project Indus and the Indian languages it covers. |
+| <https://india.entrepreneur.com/technology/tech-mahindra-increases-ai-investment-in-fy26-working-on/498829> | Context only: AI investment news. |
 
 When you have read them, write one sentence per page in your own words in the margin. The company sheet in section 13 shows how to connect each one to SANKET.
 
@@ -72,13 +72,13 @@ Each block has: what it does, how, why this way, the file to open, and the one-m
 
 **What.** Checks a message is usable, hides personal data, and tidies the text.
 
-**How.** `validate` refuses empty text, text over 2,000 characters and text with no letters. `redact` finds emails, phones, card numbers and account numbers with **regular expressions** (a pattern language for finding text) and replaces them with placeholders such as `[CARD]`. Then `clean` lower-cases the text and makes spacing consistent.
+**How.** `validate` refuses empty text, text over 2,000 characters and text with no letters. `redact` finds emails (also written out as "name at gmail dot com"), UPI ids, phones, card numbers, Aadhaar numbers, PAN numbers and account numbers with **regular expressions** (a pattern language for finding text) and replaces them with placeholders such as `[CARD]`. Cards must pass the Luhn checksum and Aadhaar numbers the **Verhoeff checksum** (another check-digit rule), so random long numbers are left alone. Then `clean` lower-cases the text and makes spacing consistent.
 
 **Why this way.** Patterns can be read and tested line by line. A learned detector cannot. The same `clean` runs at training and serving time, which avoids **train/serve skew** (the model seeing text prepared differently in production than in training).
 
 **Open.** `sanket/pipeline/pii.py: redact, luhn_ok`; `sanket/pipeline/clean.py: clean`; `sanket/pipeline/quality.py: check_frame`.
 
-**One minute.** "Before the model sees a complaint I do two things. First I check it is usable: not empty, not too long, has letters. Second I remove personal data: emails, phones, card and account numbers become placeholders like [CARD]. For cards I do not trust the pattern alone: a long number is treated as a card only if it passes the Luhn checksum, the check card numbers are built to pass, so an order number is not hidden by mistake. Only the cleaned text is stored. The same clean function runs when I train and when I serve. For the training files there is a separate quality step that fails loudly on missing values, duplicates, unknown labels, uncleaned text or rows shared between splits."
+**One minute.** "Before the model sees a complaint I do two things. First I check it is usable: not empty, not too long, has letters. Second I remove personal data: emails, UPI ids, phones, card, Aadhaar, PAN and account numbers become placeholders like [CARD]. For cards I do not trust the pattern alone: a long number is treated as a card only if it passes the Luhn checksum, the check card numbers are built to pass, so an order number is not hidden by mistake. Only the cleaned text is stored. The same clean function runs when I train and when I serve. For the training files there is a separate quality step that fails loudly on missing values, duplicates, unknown labels, uncleaned text or rows shared between splits."
 
 ### 3.2 Classify
 
@@ -475,11 +475,11 @@ Test: `tests/api/test_review_safety.py::test_note_and_reviewer_are_redacted_ever
 - Short English questions (median about 10 words), not long complaints; no real personal data in them.
 - Team and urgency are my rubric, not labels from the dataset or from a bank.
 - Label noise: an audit disagreed with 12 of 150 sampled training labels (8%).
-- Near-duplicates: 351 of 3,080 test rows (11.4%) have a training text with cosine similarity above 0.9. The test set is official and frozen, so they stay. Q1 measured that removing such rows changes test macro-F1 only from 0.876 to 0.873 for a plain TF-IDF model.
+- Near-duplicates: 351 of 3,080 test rows (11.4%) have a training text with **cosine similarity** (how alike two texts' word vectors point, 0 to 1) above 0.9. The test set is official and frozen, so they stay. Before the fix, Q1 checked a narrower set (89 test rows with almost the same words as a train row): a plain TF-IDF model got 0.978 accuracy on them against 0.872 on the rest, yet dropping them moved test macro-F1 only from 0.876 to 0.873.
 - One test set is reused by every retrain gate decision; over many rounds that slowly overfits to it.
 - Temperature and thresholds share the validation set.
 - Review data is a biased sample: only uncertain tickets get reviewed.
-- PII gaps: UPI ids (`name@okaxis`), Aadhaar, PAN and "name at gmail dot com" are not masked. A phone written right after "paid" is left alone on purpose (it looks like an amount).
+- PII is pattern-based. The last fix round added Aadhaar (Verhoeff-checked), PAN, UPI ids and written-out emails, but any format nobody wrote a pattern for (a passport number, for example) is not masked. A phone written right after "paid" is left alone on purpose (it looks like an amount).
 - Chunked request bodies skip the 20 kB size check (text is still limited to 2,000 characters).
 - SQLite: one writer at a time. Q3 load test: 1 client p50 8.6 ms; 32 clients p50 164 ms, p95 720 ms, zero errors in 1,400 requests.
 - No login: anyone with the link can review.
@@ -495,17 +495,17 @@ Test: `tests/api/test_review_safety.py::test_note_and_reviewer_are_redacted_ever
 | Rubric, not labels | "The dataset gives intents. Teams and urgency are a table I wrote. So my team and urgency scores measure agreement with my table. In a real bank, the table would come from operations, and overrides tell you where it is wrong." |
 | Short English data | "Banking77 is short English questions. Real complaints are longer and mixed language. I measured that gap with a Hinglish set and a typo set instead of hiding it." |
 | Hinglish | "On 60 Hinglish messages, 26 went to a person, none went silently to the wrong team, and one got the wrong intent in the right team. It is a small sample. The fix is Hinglish training data, not a bigger threshold." |
-| Near-duplicates | "About 11% of test rows have a close paraphrase in training. I could not drop them because the test set is official, so I documented it. An audit showed the score barely moves without them." |
+| Near-duplicates | "About 11% of test rows have a close paraphrase in training. I could not drop them because the test set is official, so I documented it. On the closest copies an audit found the score barely moves without them, but I would not claim that for all 351." |
 | Calibration | "The raw model was under-confident: 74% average confidence, 90% accuracy. One temperature fixed it, ECE 0.16 to 0.015. I fitted it on the same validation set as the thresholds, which I would split in a stricter setup." |
 | Reused test set | "Every gate decision uses the same test set. That is fine for a few rounds; over many it overfits. Production needs a fresh labelled sample each month." |
-| PII gaps | "Pattern-based redaction covers emails, phones, cards with Luhn, and account numbers. It does not cover UPI ids, Aadhaar or PAN yet. Adding PAN is a 3-line change with a test; I practised it." |
+| PII gaps | "Redaction is pattern-based: emails, UPI ids, phones, cards with Luhn, Aadhaar with Verhoeff, PAN, account numbers. Anything without a pattern, like a passport number, is not caught. Adding a pattern is a few lines plus a test; I practised it with passports." |
 | Chunked bodies | "The 20 kB limit reads the Content-Length header. A chunked request has none, so it is read fully and then refused by the 2,000-character rule. A streaming limit in middleware would close that." |
 | Docker not verified | "The sandbox had no Docker daemon, so I could not build the image. The same app runs with `make serve`, and the Space bundle was tested by running it from its own folder." |
 | Built with AI tools | See question Q60 in section 10. |
 
 ### 7.3 What production would need
 
-Authentication and reviewer roles; PostgreSQL; a message queue for bursts; streaming body limits; more PII kinds; a fresh labelled test sample per period; real team and urgency labels from the operations team; alerting on drift; per-language models or Hinglish training data; audit retention rules.
+Authentication and reviewer roles; PostgreSQL; a message queue for bursts; streaming body limits; PII patterns reviewed by a privacy team (or a pattern plus entity-recogniser mix); a fresh labelled test sample per period; real team and urgency labels from the operations team; alerting on drift; per-language models or Hinglish training data; audit retention rules.
 
 ---
 
@@ -775,12 +775,12 @@ Yes. I planned it and built it with AI coding agents working under my direction,
 The data has no customer attributes, so I cannot measure group fairness directly. What I can measure is language: Hinglish performs worse. The design response is to send unfamiliar text to a person rather than guess, and to report the gap.
 
 #### Q62. What personal data could still leak?
-Formats outside the patterns: UPI ids, Aadhaar, PAN, "name at gmail dot com". I would add patterns with tests, and in production combine patterns with a reviewed entity recogniser.
+Anything with no pattern: passport numbers, names, addresses, and a phone written right after "paid" (treated as an amount on purpose). Audits pushed the coverage up from email, phone, card and account to also Aadhaar, PAN, UPI ids and written-out emails. In production I would combine patterns with a reviewed entity recogniser.
 
 ### G. Reflection
 
 #### Q63. What would you improve first?
-Real or Hinglish training data; PAN, Aadhaar and UPI masking; a second labelled test sample so the gate does not wear out one test set; login for reviewers; PostgreSQL.
+Real or Hinglish training data; name and address masking; a second labelled test sample so the gate does not wear out one test set; login for reviewers; PostgreSQL.
 
 #### Q64. What was the hardest bug?
 The retrain gate. The obvious fix (reject if the model disagrees a lot) blocked honest reviewers, because people only review hard tickets. The fix that worked was asking whether the label is in the model's top 5.
@@ -797,16 +797,16 @@ Each number is in a model card, benchmark file or audit log, with a test or scri
 
 Do these alone, on your laptop, in a Git branch (`git checkout -b practice`). Afterwards run `git checkout .` to undo. Each has an expected result so you can check yourself.
 
-### Exercise 1: add a [PAN] redaction with a test
+### Exercise 1: add a [PASSPORT] redaction with a test
 
-**Task.** Indian PAN numbers look like `ABCPK1234Q`: 5 letters, 4 digits, 1 letter.
+**Task.** First read how `[PAN]` is done in `sanket/pipeline/pii.py` (`PAN_RE` and the line in `redact`). Indian passport numbers look like `K1234567`: one letter, then 7 digits, the first of them not 0. Add the same kind of redaction for them.
 
-1. In `sanket/pipeline/pii.py`, add `PAN_RE = re.compile(r"(?i)\b[A-Z]{5}\d{4}[A-Z]\b")`.
-2. In `redact`, add `"PAN": 0` to `counts`, and a swap function like `swap_email` that writes `[PAN]`.
-3. **Trap:** `clean` lower-cases everything except known placeholders. Add `PAN` to `_PLACEHOLDER` in `clean.py` (and to `PLACEHOLDER` in `service.py`), or you will get `[pan]`.
+1. In `pii.py`, add `PASSPORT_RE = re.compile(r"(?i)(?<![A-Za-z0-9])[A-Z][1-9]\d{6}(?![A-Za-z0-9])")`.
+2. In `redact`, add `"PASSPORT": 0` to `counts`, and a line like the PAN one: `text = PASSPORT_RE.sub(lambda m: _count(counts, "PASSPORT"), text)`.
+3. **Trap:** `clean` lower-cases everything except known placeholders. Add `PASSPORT` to `_PLACEHOLDER` in `clean.py` and to `PLACEHOLDER` in `service.py`, or you will get `[passport]`.
 4. Add a test in `tests/unit/test_pii.py`.
 
-**Expected.** `clean("My PAN is ABCPK1234Q").text == "my pan is [PAN]"` and `pii == {"PAN": 1}`. `make test` still passes (no split contains a PAN-shaped string; checked).
+**Expected.** `clean("My passport is K1234567").text == "my passport is [PASSPORT]"` and `pii == {"PASSPORT": 1}`. `make test` still passes: no data split and no probe row contains a passport-shaped string (checked). Today, without your change, the same text comes out as `my passport is k1234567`.
 
 ### Exercise 2: move an intent to another team and re-evaluate
 

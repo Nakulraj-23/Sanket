@@ -1,0 +1,1049 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SANKET interview guide</title>
+<style>
+:root { --ink:#1d2330; --muted:#5b6475; --line:#d9dee7; --accent:#1f5fbf; --bg:#ffffff; --soft:#f4f6fa; }
+@media (prefers-color-scheme: dark) {
+  :root { --ink:#e6e9ef; --muted:#a3abba; --line:#353c4a; --accent:#7fb0ff; --bg:#14171d; --soft:#1d212a; }
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--ink);
+  font: 17px/1.6 -apple-system, "Segoe UI", Roboto, "Noto Sans", Arial, sans-serif; }
+main { max-width: 860px; margin: 0 auto; padding: 24px 16px 80px; }
+h1 { font-size: 1.9rem; line-height: 1.25; margin: 0.4em 0; }
+h2 { font-size: 1.45rem; margin-top: 2.2em; padding-top: 0.6em; border-top: 2px solid var(--line); }
+h3 { font-size: 1.15rem; margin-top: 1.6em; }
+h4 { font-size: 1rem; }
+a { color: var(--accent); overflow-wrap: anywhere; }
+p, li { overflow-wrap: break-word; }
+code { font: 0.88em/1.4 ui-monospace, Menlo, Consolas, monospace; background: var(--soft);
+  padding: 0.1em 0.3em; border-radius: 4px; overflow-wrap: anywhere; }
+pre { background: var(--soft); padding: 12px; border-radius: 6px; overflow-x: auto; }
+pre code { padding: 0; background: none; overflow-wrap: normal; }
+.table-wrap { overflow-x: auto; margin: 1em 0; }
+table { border-collapse: collapse; width: 100%; font-size: 0.93rem; }
+th, td { border: 1px solid var(--line); padding: 6px 8px; text-align: left; vertical-align: top; }
+th { background: var(--soft); }
+hr { border: 0; border-top: 1px solid var(--line); margin: 2em 0; }
+nav.toc { background: var(--soft); border-radius: 8px; padding: 12px 16px; margin: 1em 0 2em; }
+nav.toc ul { margin: 0.2em 0; padding-left: 1.2em; }
+details.q { border: 1px solid var(--line); border-radius: 6px; margin: 8px 0; padding: 0 12px; }
+details.q > summary { cursor: pointer; font-weight: 600; padding: 10px 0; list-style-position: outside; }
+details.q[open] > summary { border-bottom: 1px solid var(--line); margin-bottom: 8px; }
+.tools { display: flex; gap: 8px; flex-wrap: wrap; margin: 8px 0 16px; }
+.tools button { font: inherit; font-size: 0.9rem; padding: 6px 12px; border: 1px solid var(--line);
+  background: var(--soft); color: var(--ink); border-radius: 6px; cursor: pointer; }
+.meta { color: var(--muted); font-size: 0.9rem; }
+@media print {
+  :root { --ink:#000; --muted:#333; --line:#999; --bg:#fff; --soft:#f2f2f2; --accent:#000; }
+  body { font-size: 11pt; }
+  main { max-width: none; padding: 0; }
+  h2 { break-before: page; page-break-before: always; border-top: 0; }
+  h3, h4, summary { break-after: avoid; page-break-after: avoid; }
+  table, pre, details.q { break-inside: avoid; page-break-inside: avoid; }
+  .tools, nav.toc { display: none; }
+  details.q { border: 0; padding: 0; }
+  a { text-decoration: none; }
+}
+</style>
+</head>
+<body>
+<main>
+<p class="meta">Generated from docs/INTERVIEW_GUIDE.md by scripts/build_guide_html.py. Print it: every section starts on a new page and all answers open.</p>
+<nav class="toc"><strong>Contents</strong><div class="toc">
+<ul>
+<li><a href="#1-pitches">1. Pitches</a></li>
+<li><a href="#2-why-i-built-this-for-tech-mahindra">2. Why I built this for Tech Mahindra</a></li>
+<li><a href="#3-the-components-one-by-one">3. The components, one by one</a></li>
+<li><a href="#4-concepts-from-first-principles-with-tiny-examples">4. Concepts from first principles, with tiny examples</a></li>
+<li><a href="#5-results-and-how-to-read-them">5. Results and how to read them</a></li>
+<li><a href="#6-what-reviewers-found-and-what-i-fixed">6. What reviewers found and what I fixed</a></li>
+<li><a href="#7-honest-limitations-and-how-to-say-them">7. Honest limitations and how to say them</a></li>
+<li><a href="#8-job-description-line-evidence-in-sanket">8. Job description line → evidence in SANKET</a></li>
+<li><a href="#9-four-minute-demo-script">9. Four-minute demo script</a></li>
+<li><a href="#10-question-bank-66-questions">10. Question bank (66 questions)</a></li>
+<li><a href="#11-five-hands-on-exercises">11. Five hands-on exercises</a></li>
+<li><a href="#12-five-day-study-plan-2-hours-a-day">12. Five-day study plan (2 hours a day)</a></li>
+<li><a href="#13-company-sheet">13. Company sheet</a></li>
+</ul>
+</div>
+</nav>
+<h1 id="sanket-interview-guide">SANKET interview guide</h1>
+<p>For: the Tech Mahindra Digital Catalyst AI Engineer interview.
+Goal: you can explain every part of SANKET in plain words, show the code, and answer honestly.</p>
+<p>How to use this guide:</p>
+<ul>
+<li>Read one section at a time. Each paragraph has one idea.</li>
+<li>Every technical word is explained the first time it appears here, and again in <a href="GLOSSARY.md">GLOSSARY.md</a>.</li>
+<li>Every number comes from the model card (<code>artifacts/models/v1/card.json</code>), <code>docs/bench.md</code>, a handoff note in <code>docs/handoffs/</code>, or <code>docs/AUDIT_LOG.md</code>. If a number changed during the audits, this guide uses the latest one.</li>
+<li>The 5-day plan at the end tells you what to read each day.</li>
+</ul>
+<hr />
+<h2 id="1-pitches">1. Pitches</h2>
+<h3 id="30-seconds">30 seconds</h3>
+<p>"SANKET is a support-ticket triage system for a bank.
+It reads a customer message, hides personal data like card numbers, and predicts what the customer wants, out of 77 intents.
+A table I wrote turns that into a team and an urgency.
+If the model is sure, the ticket goes straight to the team; if not, a person reviews it and the correction is logged.
+It watches for drift, and a new model replaces the old one only if a frozen test says it is not worse.
+On the official test set it routes 94% of tickets on its own, and 99% of those go to the right team."</p>
+<h3 id="2-minutes">2 minutes</h3>
+<p>"I wanted to build the smallest system that shows what an AI engineer does beyond training a model: data, model, API, human control, monitoring and safe retraining.</p>
+<p>The data is Banking77, a public set of about 13,000 real customer messages to a bank, each labelled with one of 77 intents. I split it into train, validation, a 'stream' that feeds the live demo, and the official test set, which I never touch until the end.</p>
+<p>First, every message is cleaned. Emails, phones, card numbers and account numbers become placeholders. A long number counts as a card only if it passes the Luhn checksum, so order numbers are not hidden by mistake. The same clean function runs at training and serving time.</p>
+<p>The model is TF-IDF plus logistic regression. That means: each word gets a score, the model multiplies scores by learned weights and adds them up, one total per intent. Because it is a sum, I can show exactly which words drove each answer. I also built a small PyTorch network and benchmarked it honestly. It lost by 1.4 points of macro-F1, so the simple model serves.</p>
+<p>A YAML table maps each intent to one of 7 teams and an urgency. I add up intent probabilities per team. If the best team is under 0.70, a person looks. If the chance of a high-urgency intent is 0.20 or more, it is marked urgent; that cut-off catches 98.3% of urgent test tickets.</p>
+<p>People review uncertain tickets in a queue. A database rule makes sure two reviewers cannot both decide one ticket. A monitor compares live tickets with validation tickets using PSI and a KS test that I wrote in NumPy. A retrain command learns from corrections and is blocked if the new model is worse or the labels look poisoned.</p>
+<p>Three separate audits tried to break it. They found real bugs, like card numbers hidden by odd spacing, and a speed comparison that was wrong by a factor of eight. Each fix has a test. Everything is in one FastAPI service and a React page with a fallback when the free server is asleep."</p>
+<hr />
+<h2 id="2-why-i-built-this-for-tech-mahindra">2. Why I built this for Tech Mahindra</h2>
+<p>Say this only in this form. Do not claim any knowledge of Tech Mahindra's internal systems.</p>
+<p>"The job description says AI engineers do more than train models: they build reliable, responsible and scalable solutions. Ticket triage is the smallest complete system where you can show all of that: data checks, a model, an API, a human in the loop, monitoring and a safe update process. Tech Mahindra's public material talks about AI for service desks, contact centres and banking, so I picked a banking support problem."</p>
+<p><strong>Public links to read before the interview.</strong> The build machine could not open any of these pages (its network blocked every Tech Mahindra and news address). So this guide does not quote them. Before the interview, open each link yourself. Use a link only if it loads. Quote only what the page actually says. If a link fails, drop it.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Link</th>
+<th>What to check on the page</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="https://insights.techmahindra.com/assets/next-generation-service-desk-solution-for-smarter-support.pdf">https://insights.techmahindra.com/assets/next-generation-service-desk-solution-for-smarter-support.pdf</a></td>
+<td>Does it describe an AI-assisted service desk? Does it mention ticket classification or routing?</td>
+</tr>
+<tr>
+<td><a href="https://techmahindra.com/node/2617">https://techmahindra.com/node/2617</a></td>
+<td>What the page is about (the plan expected "agentAssistX", IT support automation).</td>
+</tr>
+<tr>
+<td><a href="https://insights.techmahindra.com/assets/nps-boost-with-ai-enabled-contact-center-operations.pdf">https://insights.techmahindra.com/assets/nps-boost-with-ai-enabled-contact-center-operations.pdf</a></td>
+<td>Who the client is, and whether complaint handling is described.</td>
+</tr>
+<tr>
+<td><a href="https://insights.techmahindra.com/assets/redefining-intelligent-banking-with-agentic-ai.pdf">https://insights.techmahindra.com/assets/redefining-intelligent-banking-with-agentic-ai.pdf</a></td>
+<td>What it says about AI in banking and about human oversight.</td>
+</tr>
+<tr>
+<td><a href="https://www.techmahindra.com/insights/press-releases/tech-mahindra-unveils-techm-orion/">https://www.techmahindra.com/insights/press-releases/tech-mahindra-unveils-techm-orion/</a></td>
+<td>What TechM Orion is; any sentence on guardrails or human oversight.</td>
+</tr>
+<tr>
+<td><a href="https://www.techmahindra.com/services/artificial-intelligence/verifai/">https://www.techmahindra.com/services/artificial-intelligence/verifai/</a></td>
+<td>What VerifAI checks (AI validation and testing?).</td>
+</tr>
+<tr>
+<td><a href="https://www.techmahindra.com/insights/press-releases/tech-mahindra-launches-project-indus-large-language-model-llm/">https://www.techmahindra.com/insights/press-releases/tech-mahindra-launches-project-indus-large-language-model-llm/</a></td>
+<td>Project Indus and the Indian languages it covers.</td>
+</tr>
+<tr>
+<td><a href="https://india.entrepreneur.com/technology/tech-mahindra-increases-ai-investment-in-fy26-working-on/498829">https://india.entrepreneur.com/technology/tech-mahindra-increases-ai-investment-in-fy26-working-on/498829</a></td>
+<td>Context only: AI investment news.</td>
+</tr>
+</tbody>
+</table></div>
+<p>When you have read them, write one sentence per page in your own words in the margin. The company sheet in section 13 shows how to connect each one to SANKET.</p>
+<hr />
+<h2 id="3-the-components-one-by-one">3. The components, one by one</h2>
+<p>Each block has: what it does, how, why this way, the file to open, and the one-minute answer to say out loud.</p>
+<h3 id="31-intake-and-clean">3.1 Intake and clean</h3>
+<p><strong>What.</strong> Checks a message is usable, hides personal data, and tidies the text.</p>
+<p><strong>How.</strong> <code>validate</code> refuses empty text, text over 2,000 characters and text with no letters. <code>redact</code> finds emails (also written out as "name at gmail dot com"), UPI ids, phones, card numbers, Aadhaar numbers, PAN numbers and account numbers with <strong>regular expressions</strong> (a pattern language for finding text) and replaces them with placeholders such as <code>[CARD]</code>. Cards must pass the Luhn checksum and Aadhaar numbers the <strong>Verhoeff checksum</strong> (another check-digit rule), so random long numbers are left alone. Then <code>clean</code> lower-cases the text and makes spacing consistent.</p>
+<p><strong>Why this way.</strong> Patterns can be read and tested line by line. A learned detector cannot. The same <code>clean</code> runs at training and serving time, which avoids <strong>train/serve skew</strong> (the model seeing text prepared differently in production than in training).</p>
+<p><strong>Open.</strong> <code>sanket/pipeline/pii.py: redact, luhn_ok</code>; <code>sanket/pipeline/clean.py: clean</code>; <code>sanket/pipeline/quality.py: check_frame</code>.</p>
+<p><strong>One minute.</strong> "Before the model sees a complaint I do two things. First I check it is usable: not empty, not too long, has letters. Second I remove personal data: emails, UPI ids, phones, card, Aadhaar, PAN and account numbers become placeholders like [CARD]. For cards I do not trust the pattern alone: a long number is treated as a card only if it passes the Luhn checksum, the check card numbers are built to pass, so an order number is not hidden by mistake. Only the cleaned text is stored. The same clean function runs when I train and when I serve. For the training files there is a separate quality step that fails loudly on missing values, duplicates, unknown labels, uncleaned text or rows shared between splits."</p>
+<h3 id="32-classify">3.2 Classify</h3>
+<p><strong>What.</strong> Turns cleaned text into 77 probabilities, one per intent.</p>
+<p><strong>How.</strong> <strong>TF-IDF</strong> (term frequency times inverse document frequency: a score that is high for a word that is frequent in this message and rare overall) turns the text into numbers. It uses words and pairs of words, plus 2 to 5 letter pieces inside words. <strong>Logistic regression</strong> (a linear model: a weighted sum per class, turned into probabilities) holds one weight per term per intent. The 77 totals go through <strong>softmax</strong> (raise e to each total, divide by the sum) to become probabilities. Finally the totals are divided by a <strong>temperature</strong> of 0.591 so the confidence is honest (section 4.6).</p>
+<p><strong>Why this way.</strong> It is strong on short texts, fast (0.82 ms per ticket at p50) and fully explainable. The challenger, a small PyTorch network, scored lower (section 5.2).</p>
+<p><strong>Open.</strong> <code>sanket/models/baseline.py: predict_proba, scores</code>; <code>sanket/models/nn/net.py: IntentNet.forward</code>.</p>
+<p><strong>One minute.</strong> "The model turns the text into numbers and the numbers into 77 probabilities. TF-IDF gives each word and short letter group a score: high if it is frequent in this message and rare in general. Logistic regression holds one weight per term per intent. It multiplies scores by weights, adds them up, and softmax turns the 77 totals into probabilities that sum to one. I also built a small PyTorch network: it looks up a 64-number vector for each word, averages them, and passes the average through two layers. On the test set the baseline scores macro-F1 0.900 and the network 0.887. The network is about 15 times faster, 0.055 against 0.82 milliseconds, but both are far below a millisecond. So the linear model serves because it is more accurate and its explanations are exact. I report both."</p>
+<h3 id="33-explain-and-route">3.3 Explain and route</h3>
+<p><strong>What.</strong> Shows the words behind the answer, then picks a team, an urgency, and whether a person must look.</p>
+<p><strong>How (explain).</strong> For a linear model, the score of an intent is a sum of (weight × TF-IDF value) over the words in the message, plus an <strong>intercept</strong> (a fixed number per intent). So the five biggest terms are an exact explanation, not an estimate.</p>
+<p><strong>How (route).</strong> <code>taxonomy.yaml</code> maps each intent to one of 7 teams and to an urgency. Team probability = sum of its intents' probabilities. Then:</p>
+<ul>
+<li>team confidence under <strong>0.70</strong> → a person looks (<code>low_confidence</code>);</li>
+<li>more than <strong>20%</strong> unknown words <strong>and</strong> team confidence under <strong>0.97</strong> → a person looks (<code>unfamiliar_words</code>);</li>
+<li>otherwise → auto-routed;</li>
+<li>urgent ("high") if the summed probability of the 9 high-urgency intents is at least <strong>0.20</strong>.</li>
+</ul>
+<p><strong>Why this way.</strong> Banking77 has no team or urgency labels, so a learned urgency model would be invented. The table is the project's <strong>rubric</strong> (a rule table a person wrote), and I say so. The urgent cut-off is low on purpose: missing a fraud report costs more than an extra look.</p>
+<p><strong>Open.</strong> <code>sanket/routing/decide.py: decide</code> (about 30 lines, no files, no database); <code>sanket/taxonomy.yaml</code>; <code>sanket/routing/thresholds.py</code>.</p>
+<p><strong>One minute.</strong> "For a linear model the explanation is exact. The score for an intent is a sum of weight times TF-IDF value, one term per word, so I show the five largest terms. Then routing. The data has 77 intents; my table maps each to one of 7 teams and to an urgency. The probability of a team is the sum of its intents' probabilities. If the best team is under 0.70, or many words are unknown and the team is not very clear, the ticket goes to a person. A ticket is urgent when the high-urgency intents together reach 0.20. I chose that on validation data to catch at least 97% of urgent tickets; on test it catches 98.3% with 91.5% precision. Missing a fraud report costs more than a wasted look."</p>
+<h3 id="34-review">3.4 Review</h3>
+<p><strong>What.</strong> A queue where a person confirms or corrects uncertain tickets.</p>
+<p><strong>How.</strong> The queue is ordered urgent first, then oldest (<code>ORDER BY</code> with a <code>CASE</code>). Saving a review runs a <strong>transaction</strong> (a group of database changes that happen together or not at all): it flips the ticket to <code>reviewed</code> only if it is not already reviewed, then inserts the review. If no row changed, the second reviewer gets <strong>HTTP 409</strong> (conflict). A <strong>unique constraint</strong> on <code>reviews.ticket_id</code> is a second lock. The reviewer name and note are redacted too.</p>
+<p><strong>Why this way.</strong> Two people can open the same ticket at the same time. That is a <strong>race condition</strong> (the result depends on who is first). The conditional update makes the database decide.</p>
+<p><strong>Open.</strong> <code>sanket/review.py: save_review, _claim_and_insert, list_tickets</code>; <code>sanket/sql/metrics.sql</code>.</p>
+<p><strong>One minute.</strong> "Tickets the model is unsure about wait in a queue, urgent first, then oldest. A person confirms the prediction or picks the right intent. The decision is saved with who, when and a note, and the note is redacted like the ticket. A transaction and a unique constraint make sure two people cannot both decide the same ticket: the second gets a clear 'already reviewed' answer, HTTP 409. These rows are the override log and the training data for the next model. If the intent was right but the reviewer disagrees with the urgency, that means my table needs changing, not the model."</p>
+<h3 id="35-monitor">3.5 Monitor</h3>
+<p><strong>What.</strong> Warns when live tickets stop looking like the tickets the model was tuned on.</p>
+<p><strong>How.</strong> It compares the latest 500 tickets with the validation set on four signals: message length, unfamiliar-word rate, team confidence (each with a <strong>KS test</strong>, which finds the biggest gap between two cumulative curves), and the predicted-team mix (with <strong>PSI</strong>, the Population Stability Index). Overall status is the worst of the four. Under 200 tickets it says <code>insufficient_data</code>.</p>
+<p><strong>Why this way.</strong> True labels arrive late. These signals are available now. Both formulas are written in NumPy so I can explain every line; KS is checked against SciPy in a test.</p>
+<p><strong>Open.</strong> <code>sanket/monitoring/drift.py: psi, ks_2samp, drift_report</code>; <code>sanket/api/queries.py: live_inputs</code>.</p>
+<p><strong>One minute.</strong> "A model is trained on yesterday's messages. If today's look different it can be wrong without knowing. True labels arrive late, so I watch what I can measure now: message length, the share of unknown words, the model's confidence, and the mix of predicted teams. PSI puts both periods into the same bins and sums (actual minus expected) times the log of actual over expected: under 0.1 is stable, over 0.25 is a real shift. The KS test sorts both samples and finds the largest gap between their cumulative curves. I wrote both in NumPy and checked KS against SciPy. When I simulate a Hinglish surge, the unknown-word signal goes red. Drift is a reason to look, not proof the model is wrong."</p>
+<h3 id="36-retrain-gate">3.6 Retrain gate</h3>
+<p><strong>What.</strong> Learns from corrections, and replaces the live model only if the new one is not worse.</p>
+<p><strong>How.</strong> <code>make retrain</code> reads reviewed tickets, adds them to the training data, and trains a <strong>challenger</strong> (a candidate model) with the same code. It is promoted over the <strong>champion</strong> (the model in service) only if all of these hold:</p>
+<ol>
+<li>at least 75% of the new labels are among the champion's top 5 guesses (label sanity);</li>
+<li>data-quality checks pass;</li>
+<li>on the frozen test set: macro-F1 at most 0.005 below the champion, high-urgency recall at most 0.01 below;</li>
+<li>on the frozen validation set: the same rule with double slack;</li>
+<li>macro-F1 at most 0.01 below the best model ever promoted;</li>
+<li>file sizes within limits.</li>
+</ol>
+<p>Every attempt, promoted or rejected, is written to <code>artifacts/registry.json</code> with reasons.</p>
+<p><strong>Why this way.</strong> A bad reviewer, or someone malicious, could poison the labels. The gate catches it.</p>
+<p><strong>Open.</strong> <code>sanket/retrain.py: gate, label_sanity_problems, run_retrain</code>; <code>tests/model/test_quality_gates.py</code>.</p>
+<p><strong>One minute.</strong> "Retraining adds the human-corrected tickets to the training set and fits a new model with the same code. Then the gate: the new model is scored on a test set that neither model has trained on, and it replaces the live model only if its macro-F1 and urgent-ticket recall are not worse, within a small tolerance. There is also a label sanity check: at least 75% of the new labels must be among the old model's top five guesses. Honest batches score 0.86 to 0.97; batches with 30% wrong labels score 0.58 to 0.72. In the audit, a retrain with 30% poisoned labels was rejected at 57%, and an honest one was promoted from 0.9003 to 0.9058 macro-F1. Nothing on the web can trigger this; a person runs it."</p>
+<h3 id="37-the-two-surfaces">3.7 The two surfaces</h3>
+<p><strong>REST API (<code>sanket/api/</code>, <code>sanket/service.py</code>).</strong> <strong>REST</strong> is an API style where URLs name things and HTTP methods are the actions. One <code>POST /api/tickets</code> runs clean, classify, explain and route, stores the result, and returns every stage's output and time (the <strong>trace</strong>). Status codes: 201 created, 404 not found, 409 already reviewed, 413 body too large, 422 invalid input. <strong>CORS</strong> (the browser rule about which web addresses may call the API) is an allow-list from <code>SANKET_CORS_ORIGINS</code>.</p>
+<p><strong>Dashboard (<code>web/src/</code>).</strong> One page: a text box, six sample chips, seven stage cards, then the review queue, monitor and model panels. Clicking a card shows what it does, why, the real code (read from the running function, so it cannot go stale), and this ticket's data. If the API does not answer <code>/api/health</code> within 4 seconds, the page shows recorded real answers from <code>web/public/replay.json</code> with an amber "Replay" badge, and keeps retrying.</p>
+<hr />
+<h2 id="4-concepts-from-first-principles-with-tiny-examples">4. Concepts from first principles, with tiny examples</h2>
+<p>Work through each example on paper. You need a calculator only for logs and exponents.</p>
+<h3 id="41-tf-idf-on-three-tiny-messages">4.1 TF-IDF on three tiny messages</h3>
+<p>Messages: (1) "card not working", (2) "card lost", (3) "transfer not working". N = 3 messages.</p>
+<p><strong>Document frequency</strong> (df) = in how many messages a word appears:
+card 2, not 2, working 2, lost 1, transfer 1.</p>
+<p><strong>IDF</strong> (textbook version) = ln(N / df):
+card = ln(3/2) = 0.405; lost = ln(3/1) = 1.099.</p>
+<p><strong>TF</strong> (term frequency) for message 2 is 1 for "card" and 1 for "lost". So TF-IDF: card 0.405, lost 1.099.</p>
+<p><strong>Reading it.</strong> "lost" is almost three times as informative as "card", because "card" appears everywhere.</p>
+<p><strong>What scikit-learn actually does.</strong> It uses a smoothed IDF, ln((1+N)/(1+df)) + 1: card 1.288, lost 1.693. Then it scales the vector to length 1: card 0.61, lost 0.80. SANKET also uses "sublinear" TF, 1 + ln(count), so a word repeated five times does not count five times as much.</p>
+<h3 id="42-dot-product-and-a-logistic-regression-score-by-hand">4.2 Dot product and a logistic-regression score by hand</h3>
+<p>A <strong>dot product</strong> multiplies two lists position by position and adds the results.</p>
+<p>Message "card lost", TF-IDF vector: card 0.61, lost 0.80. Three intents with made-up weights (the real model has 20,672 weights per intent):</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Intent</th>
+<th>weight for "card"</th>
+<th>weight for "lost"</th>
+<th>intercept</th>
+<th>score</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>lost_or_stolen_card</td>
+<td>0.5</td>
+<td>3.0</td>
+<td>−0.2</td>
+<td>0.61×0.5 + 0.80×3.0 − 0.2 = <strong>2.505</strong></td>
+</tr>
+<tr>
+<td>card_arrival</td>
+<td>1.2</td>
+<td>−0.8</td>
+<td>0.1</td>
+<td>0.732 − 0.640 + 0.1 = <strong>0.192</strong></td>
+</tr>
+<tr>
+<td>exchange_rate</td>
+<td>−0.3</td>
+<td>0.0</td>
+<td>0.0</td>
+<td><strong>−0.183</strong></td>
+</tr>
+</tbody>
+</table></div>
+<p>The explanation for <code>lost_or_stolen_card</code> is the table row itself: "lost" contributed 2.40, "card" 0.31, intercept −0.2. They add up to the score. That is why the linear model's explanation is exact.</p>
+<h3 id="43-softmax-with-three-classes">4.3 Softmax with three classes</h3>
+<p>Softmax: p_i = e^(score_i) / sum of e^(score_j).</p>
+<p>From 4.2: e^2.505 = 12.24, e^0.192 = 1.21, e^−0.183 = 0.83. Total 14.29.
+Probabilities: 12.24 / 14.29 = <strong>0.857</strong>, 0.085, 0.058. They add up to 1.</p>
+<p>A simpler set to remember: scores 2.0, 1.0, 0.1 → 0.659, 0.242, 0.099.</p>
+<h3 id="44-cross-entropy-the-training-penalty">4.4 Cross-entropy (the training penalty)</h3>
+<p><strong>Cross-entropy</strong> for one example = −ln(probability given to the right answer).</p>
+<ul>
+<li>Right intent got 0.857 → loss = −ln(0.857) = 0.15. Small.</li>
+<li>Right intent got 0.659 → loss 0.42.</li>
+<li>Right intent got 0.090 → loss 2.41. Confident and wrong is punished hard.</li>
+</ul>
+<p>Training adjusts the weights to make the average loss small. <strong>Regularisation</strong> (in scikit-learn, the setting C; smaller C = stronger brake) stops weights growing huge to memorise the training set. SANKET uses C = 5, chosen on validation data.</p>
+<h3 id="45-summing-probabilities-per-team">4.5 Summing probabilities per team</h3>
+<p>Intents are <strong>disjoint</strong> (a message has one intent), so probabilities of a group of intents add up.</p>
+<p>Real example from the demo ("Someone used my card abroad, I did not make this payment"): the top intent <code>card_payment_not_recognised</code> has 0.79. But FRAUD_SECURITY has six intents, and their probabilities add up to <strong>0.97</strong>. So the intent is a bit uncertain, but the team is clear. That is why routing uses the team sum.</p>
+<p>The same trick gives urgency: p_high = sum of the 9 high-urgency intents' probabilities. Here p_high = 0.97, above 0.20, so the ticket is urgent.</p>
+<p>Measured benefit: summing gave test team accuracy 0.9708, against 0.9636 for a model trained directly on the 7 teams (<code>docs/EXPERIMENTS.md</code>).</p>
+<h3 id="46-precision-recall-and-choosing-a-threshold">4.6 Precision, recall and choosing a threshold</h3>
+<p><strong>Precision</strong>: of the tickets flagged urgent, how many really are urgent.
+<strong>Recall</strong>: of the truly urgent tickets, how many were flagged.</p>
+<p>Lowering the urgent cut-off raises recall and lowers precision. The rule (CONTRACTS): pick the <strong>largest</strong> cut-off, in steps of 0.05, where validation recall is at least 0.97. Result: tau_high = 0.20. On test: recall 0.983, precision 0.915.</p>
+<p>Same idea for auto-routing: pick the <strong>smallest</strong> team cut-off where auto-routed validation tickets are at least 98.5% right. Result: tau_team = 0.70. On test, the coverage table shows the trade-off:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Team cut-off</th>
+<th>Share auto-routed (test)</th>
+<th>Team accuracy of those</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0.5</td>
+<td>98.3%</td>
+<td>0.979</td>
+</tr>
+<tr>
+<td>0.6</td>
+<td>96.6%</td>
+<td>0.986</td>
+</tr>
+<tr>
+<td><strong>0.7</strong></td>
+<td><strong>94.4%</strong></td>
+<td><strong>0.992</strong></td>
+</tr>
+<tr>
+<td>0.8</td>
+<td>92.2%</td>
+<td>0.995</td>
+</tr>
+<tr>
+<td>0.9</td>
+<td>87.3%</td>
+<td>0.999</td>
+</tr>
+</tbody>
+</table></div>
+<p>(Coverage at 0.7 is 94.4%; the card's auto share is 94.2% because the unfamiliar-word rule sends a few more to a person.)</p>
+<h3 id="47-calibration-why-09-confident-is-not-90-right">4.7 Calibration: why "0.9 confident" is not "90% right"</h3>
+<p>A model is <strong>calibrated</strong> if, among all answers given with confidence around 0.9, about 90% are right.</p>
+<p>Nothing forces this. Logistic regression with regularisation tends to give softer probabilities. Measured before the fix: average confidence on test was 0.741, but accuracy was 0.900. The model was <strong>under-confident</strong>.</p>
+<p><strong>ECE</strong> (expected calibration error) measures the gap: put predictions into confidence buckets (for example 0.8 to 0.9), compare average confidence with accuracy in each bucket, and take the average gap weighted by bucket size. Before: <strong>0.160</strong>.</p>
+<p><strong>Temperature scaling</strong> fixes it with one number. Divide every raw score by T before softmax. T below 1 sharpens the probabilities; T above 1 flattens them. T is chosen to minimise cross-entropy on validation data. Here T = <strong>0.591</strong>.</p>
+<p>Tiny example: scores 2.0, 1.0, 0.1 give 0.659 / 0.242 / 0.099 at T = 1. At T = 0.591 they give 0.817 / 0.150 / 0.033. Same ranking, so accuracy does not change. Only the confidence changes.</p>
+<p>After: test ECE <strong>0.0146</strong>. Then the thresholds were re-chosen by the same rules (tau_team 0.70, tau_high 0.20). This also lifted test high-urgency recall from 0.9694 (just under the 0.97 target) to 0.983.</p>
+<p>Caveat to say yourself: T and the thresholds were both chosen on the same validation set. A stricter setup fits T on half of it.</p>
+<h3 id="48-embedding-average-the-neural-network">4.8 Embedding average (the neural network)</h3>
+<p>An <strong>embedding</strong> is a learned list of numbers per word. With 2 numbers per word (the real one uses 64):</p>
+<ul>
+<li>"card" → [0.2, 0.9], "lost" → [0.8, −0.1], padding → [0, 0].</li>
+</ul>
+<p><strong>Mean pooling</strong> averages the real words: ([0.2, 0.9] + [0.8, −0.1]) / 2 = [0.5, 0.4]. Padding is ignored by a mask.</p>
+<p>Then a linear layer (64 → 128 numbers), <strong>ReLU</strong> (negatives become 0), and another linear layer (128 → 77 scores). <strong>Dropout</strong> 0.3 hides random parts during training.</p>
+<p>Weakness: the average ignores word order. "not lost, arrived" and "arrived, not lost" look identical.</p>
+<h3 id="49-psi-on-two-bins-and-three">4.9 PSI on two bins (and three)</h3>
+<p>PSI = sum over bins of (actual − expected) × ln(actual / expected).</p>
+<p><strong>Two bins.</strong> Reference: 50% short messages, 50% long. Live: 70% short, 30% long.
+Bin 1: (0.7 − 0.5) × ln(0.7/0.5) = 0.2 × 0.336 = 0.067.
+Bin 2: (0.3 − 0.5) × ln(0.3/0.5) = (−0.2) × (−0.511) = 0.102.
+PSI = <strong>0.17</strong> → amber (between 0.1 and 0.25).</p>
+<p>Notice both terms are positive: a share going up or down both add to PSI.</p>
+<p><strong>Three bins.</strong> Reference 0.3 / 0.4 / 0.3, live 0.2 / 0.4 / 0.4: 0.041 + 0 + 0.029 = <strong>0.069</strong> → green.</p>
+<p>An empty bin would give ln(0), so the code puts a floor of 0.0001 on every share.</p>
+<h3 id="410-ks-on-5-5-numbers">4.10 KS on 5 + 5 numbers</h3>
+<p>Reference lengths: 3, 5, 6, 8, 9. Live lengths: 7, 10, 11, 12, 14.</p>
+<p>Walk along the number line. At each value, write the share of each sample at or below it:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>value</th>
+<th>reference share</th>
+<th>live share</th>
+<th>gap</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>6</td>
+<td>3/5 = 0.6</td>
+<td>0</td>
+<td>0.6</td>
+</tr>
+<tr>
+<td>7</td>
+<td>0.6</td>
+<td>0.2</td>
+<td>0.4</td>
+</tr>
+<tr>
+<td>9</td>
+<td>1.0</td>
+<td>0.2</td>
+<td><strong>0.8</strong></td>
+</tr>
+<tr>
+<td>12</td>
+<td>1.0</td>
+<td>0.8</td>
+<td>0.2</td>
+</tr>
+</tbody>
+</table></div>
+<p>The largest gap is <strong>D = 0.8</strong>. The code's p-value is 0.079: with only 5 numbers each, a gap this big happens by chance about 8% of the time. SANKET's rule needs p &lt; 0.01, so this would be green. That is why it waits for 200 tickets.</p>
+<p>With real sizes (1,489 reference, 500 live), even D = 0.15 is very unlikely by chance. In the recorded Hinglish surge, the unknown-word signal had D = 0.58 (red) and team confidence D = 0.15 (amber).</p>
+<h3 id="411-luhn-on-one-card-number">4.11 Luhn on one card number</h3>
+<p>Take 4111 1111 1111 1111 (a standard test number).</p>
+<ol>
+<li>Start from the right. Double every second digit: the 2nd, 4th, ..., 16th from the right.</li>
+<li>Those are seven 1s and the leading 4. Doubled: seven 2s (= 14) and 8.</li>
+<li>If a doubled digit is over 9, subtract 9 (none here).</li>
+<li>Add the undoubled digits: eight 1s = 8.</li>
+<li>Total = 14 + 8 + 8 = 30. It ends in 0, so it is <strong>valid</strong>.</li>
+</ol>
+<p>Change the last digit to 2: total 31, <strong>invalid</strong>, so SANKET would not mask it as a card. Code: <code>pii.py: luhn_ok</code>, 12 lines, O(n).</p>
+<h3 id="412-transaction-and-unique-constraint">4.12 Transaction and unique constraint</h3>
+<p>Two reviewers, A and B, click Save on ticket 7 at the same moment.</p>
+<ol>
+<li>A's transaction runs: <code>UPDATE tickets SET status='reviewed' WHERE id=7 AND status!='reviewed'</code> → 1 row changed. Insert review. Commit.</li>
+<li>B's transaction runs the same UPDATE → 0 rows changed (it is already reviewed). The code raises <code>AlreadyReviewed</code>, rolls back, and the API returns 409.</li>
+<li>If B somehow got past step 2, inserting a second review for ticket 7 breaks the unique constraint, which also becomes 409.</li>
+</ol>
+<p>Q3 tested this with 5 tickets × 10 reviewers at once: exactly one success per ticket, no orphan rows.</p>
+<h3 id="413-rest-status-codes-used-here">4.13 REST status codes used here</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Code</th>
+<th>Meaning</th>
+<th>When in SANKET</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>200</td>
+<td>OK</td>
+<td>GET a ticket; save a review</td>
+</tr>
+<tr>
+<td>201</td>
+<td>Created</td>
+<td>POST /api/tickets</td>
+</tr>
+<tr>
+<td>404</td>
+<td>Not found</td>
+<td>unknown ticket id</td>
+</tr>
+<tr>
+<td>409</td>
+<td>Conflict</td>
+<td>second review of the same ticket</td>
+</tr>
+<tr>
+<td>413</td>
+<td>Payload too large</td>
+<td>body over 20 kB</td>
+</tr>
+<tr>
+<td>422</td>
+<td>Unprocessable</td>
+<td>empty text, over 2,000 characters, unknown intent, bad reviewer name</td>
+</tr>
+<tr>
+<td>500</td>
+<td>Server error</td>
+<td>should never happen; Q3 found one (a broken character) and it was fixed to 422</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="414-big-o-of-the-main-steps">4.14 Big-O of the main steps</h3>
+<p><strong>Big-O</strong> says how work grows with input size.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Step</th>
+<th>Cost</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Luhn check</td>
+<td>O(d), d = digits</td>
+<td>one pass</td>
+</tr>
+<tr>
+<td>TF-IDF for one message</td>
+<td>O(L), L = characters</td>
+<td>each word and letter piece looked up in a hash map</td>
+</tr>
+<tr>
+<td>Score 77 intents</td>
+<td>O(k × 77), k = non-zero features</td>
+<td>sparse matrix times weights</td>
+</tr>
+<tr>
+<td>Top-5 terms</td>
+<td>O(k log 5)</td>
+<td><code>heapq.nlargest</code></td>
+</tr>
+<tr>
+<td>Team sums</td>
+<td>O(77)</td>
+<td>fixed index lists</td>
+</tr>
+<tr>
+<td>KS statistic</td>
+<td>O((n+m) log(n+m))</td>
+<td>sort, then binary search</td>
+</tr>
+<tr>
+<td>KS exact p-value</td>
+<td>O(n × m)</td>
+<td>walks a grid (only for n × m up to one million)</td>
+</tr>
+<tr>
+<td>Review queue</td>
+<td>O(log N) to find rows</td>
+<td>index on (status, created_at), then sort</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2 id="5-results-and-how-to-read-them">5. Results and how to read them</h2>
+<h3 id="51-the-main-numbers-test-set-3080-messages-official-banking77-test">5.1 The main numbers (test set, 3,080 messages, official Banking77 test)</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Measure</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Intent accuracy</td>
+<td>0.900</td>
+</tr>
+<tr>
+<td>Intent macro-F1</td>
+<td>0.900</td>
+</tr>
+<tr>
+<td>Team accuracy (summed probabilities)</td>
+<td>0.971</td>
+</tr>
+<tr>
+<td>Urgency macro-F1</td>
+<td>0.956</td>
+</tr>
+<tr>
+<td>High-urgency recall / precision</td>
+<td>0.983 / 0.915</td>
+</tr>
+<tr>
+<td>Auto-routed share</td>
+<td>94.2%</td>
+</tr>
+<tr>
+<td>Team accuracy of auto-routed tickets</td>
+<td>0.992</td>
+</tr>
+<tr>
+<td>ECE after temperature scaling</td>
+<td>0.0146</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>How to read them.</strong> <strong>Macro-F1</strong> averages the score over all 77 intents equally, so rare intents count as much as common ones. Accuracy and macro-F1 are equal here because the test set has exactly 40 messages per intent.</p>
+<p><strong>Is 0.90 good?</strong> The audit checked the task is not trivially easy: a depth-3 decision tree scored macro-F1 0.036, a length-only model 0.022, one keyword per intent 0.338 (Q1). The plan's expected band for this kind of model was 0.85 to 0.93.</p>
+<p><strong>Team and urgency numbers measure agreement with my rubric</strong>, not with real bank agents. Say this every time you quote them.</p>
+<h3 id="52-linear-model-versus-pytorch-network">5.2 Linear model versus PyTorch network</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Model</th>
+<th>Macro-F1</th>
+<th>p50 latency</th>
+<th>Size</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>TF-IDF + logistic regression</td>
+<td>0.9003</td>
+<td>0.82 ms</td>
+<td>4.93 MB</td>
+</tr>
+<tr>
+<td>IntentNet (ONNX)</td>
+<td>0.8865</td>
+<td>0.055 ms</td>
+<td>2.51 MB</td>
+</tr>
+</tbody>
+</table></div>
+<p>Three network variants were tried, all on validation only (<code>docs/EXPERIMENTS.md</code>): words only 0.8672; words plus hashed 3-letter pieces with 64 numbers per word 0.8820 (chosen); 128 numbers 0.8759. The chosen one was run on test once.</p>
+<p><strong>Why the network loses.</strong> About 90 short training messages per intent. Averaging word vectors throws away word order. TF-IDF on words and letter pieces is a very strong fit at this size.</p>
+<p><strong>Was it a fair fight?</strong> Q2 checked: same cleaned text, same test rows, cleaning included in both timings, 50 warm-up calls, 1 thread. The network was early-stopped and reached about 0.99 training accuracy, so it was not starved. Other seeds gave 0.887 to 0.889. The baseline's lead has a 95% bootstrap interval of +0.004 to +0.024, so it is real.</p>
+<p><strong>Why this is a good result to present.</strong> The decision rule was written before any result: "if the network loses, say so and explain why; no tuning until it wins". You followed it. Interviewers trust a candidate who reports a loss and knows why. And the network still has a job: it is the "second opinion" in the Compare view.</p>
+<h3 id="53-hinglish-and-typos">5.3 Hinglish and typos</h3>
+<p><strong>Hinglish</strong> (Hindi in Latin letters, mixed with English), 60 hand-written rows, test only:</p>
+<ul>
+<li>intent accuracy 0.65, team accuracy 0.717;</li>
+<li>26 of 60 went to a person;</li>
+<li>0 were silently sent to the wrong team;</li>
+<li>1 was silently given the wrong intent in the right team ("top up nahi ho raha card se": the true intent <code>top_up_failed</code> became <code>topping_up_by_card</code>).</li>
+</ul>
+<p>Say "n = 60" every time. With 60 rows, "0 silent wrong-team" still allows a true rate of up to about 9% (Q2's estimate).</p>
+<p><strong>Typos</strong>: the test set with 10% of characters changed:</p>
+<ul>
+<li>intent accuracy 0.817, team accuracy 0.936;</li>
+<li>35.4% sent to a person;</li>
+<li>0.55% silently sent to the wrong team.</li>
+</ul>
+<h3 id="54-error-analysis">5.4 Error analysis</h3>
+<p>The most common confusions on test (model card) are near-synonyms:</p>
+<ul>
+<li><code>verify_my_identity</code> → <code>why_verify_identity</code> (6)</li>
+<li><code>pending_top_up</code> → <code>top_up_failed</code> (6)</li>
+<li><code>virtual_card_not_working</code> → <code>get_disposable_virtual_card</code> (5)</li>
+<li><code>pending_transfer</code> → <code>transfer_timing</code> (4)</li>
+</ul>
+<p>Most of these stay in the same team, which is why team accuracy (0.971) is much higher than intent accuracy (0.900).</p>
+<p>Urgency errors that matter (Q2, test): 2 high-urgency tickets were predicted low, and both were sent to a person anyway ("trapped card", "cannot find my credit card"). 9 high became medium. 23 medium became high (false alarms, acceptable by design).</p>
+<p>Weakest teams by recall: FRAUD_SECURITY 0.921, CASH_ATM 0.930 (Q2).</p>
+<p>A data artefact: the token "1" (as in "£1 charge") appears in 58 of 114 training rows of <code>extra_charge_on_statement</code>. A ticket about a different amount may be misrouted, and the test score will not show it (<code>docs/data_card.md</code>).</p>
+<hr />
+<h2 id="6-what-reviewers-found-and-what-i-fixed">6. What reviewers found and what I fixed</h2>
+<p>SANKET was checked by three audit agents: Q1 (data), Q2 (model) and Q3 (system). Each wrote failing tests for its findings. A builder fixed them, the tests flipped to passing, and the auditor re-checked. Full log: <code>docs/AUDIT_LOG.md</code>. Present this as a strength: you did not trust your own work.</p>
+<p><strong>Story 1: card numbers hidden by formatting.</strong>
+The data audit tried 35 ways of writing personal data and 12 slipped through, such as a card with double spaces or dashes, phone numbers in Devanagari digits, and <code>john(at)gmail.com</code>.
+The fix maps digits of any script to 0-9, allows separators between digit groups, and searches for a Luhn-valid window inside a run of digits. Later the system audit found cards split by newlines and tabs; now every kind of whitespace becomes one space before redaction.
+Tests: <code>tests/data/test_audit_pii.py</code> (all 35 formats, plus <code>test_any_whitespace_between_groups</code>).</p>
+<p><strong>Story 2: the speed comparison was wrong by about eight times.</strong>
+The first benchmark said the network was about 125 times faster than the baseline.
+The model audit found the baseline rebuilt a 77 × 20,672 matrix on every single prediction; building it once in <code>__init__</code> took p50 from 7.69 ms to 0.82 ms with identical outputs, so the real gap is about 15 times.
+Test: <code>tests/model/test_audit_q2.py::test_baseline_predict_has_no_per_call_matrix_copy</code>.</p>
+<p><strong>Story 3: the retrain gate let poison through, then blocked honest people.</strong>
+First, 200 reviews with every label wrong were promoted, because the new model was still within 0.005 on test. The fix rejected batches where the champion disagreed with over 30% of labels, but the re-audit showed honest reviewers disagree 56% of the time, because people only see the hard tickets.
+The final rule asks whether the new label is in the champion's top 5 guesses: honest 0.86 to 0.97, 30% noise 0.58 to 0.72, all wrong 0.05, limit 0.75. Tests: <code>tests/model/test_quality_gates.py</code>.</p>
+<p><strong>Story 4: the model's confidence was dishonest.</strong>
+The model audit measured ECE 0.160: average confidence 0.741 against accuracy 0.900, and urgent recall on test was 0.9694, just under target.
+One temperature (T = 0.591, fitted on validation) brought test ECE to 0.0146, and re-chosen thresholds gave urgent recall 0.983 and 94.2% auto-routed.
+Test: <code>test_calibration_in_card</code>.</p>
+<p><strong>Story 5: the unknown-word rule drowned reviewers.</strong>
+With 10% typos, 65% of tickets went to a person, and most of those were routed correctly anyway.
+Now unknown words escalate only when team confidence is under <code>oov_conf</code>, chosen on a typo copy of validation data (0.97): test typos now send 35.4% to a person with 0.55% silent wrong-team.
+Test: <code>test_oov_conf_is_selected_on_val_typos_and_stored</code>.</p>
+<p><strong>Story 6: the review note leaked personal data.</strong>
+The system audit typed a card number, phone and email into a reviewer's note; they were stored as typed, in the table and in the database's side file.
+Now the note and reviewer name go through <code>redact</code> before anything is written or returned, and the reviewer name must be 1 to 64 characters.
+Test: <code>tests/api/test_review_safety.py::test_note_and_reviewer_are_redacted_everywhere</code>.</p>
+<p><strong>Smaller ones worth knowing.</strong> The stream file was sorted, so its first 500 rows looked like drift (fixed by shuffling). The ticket cap deleted reviewed tickets (now it never does). A broken character gave a 500 (now 422). 68 training rows were near-copies of test rows (removed).</p>
+<p><strong>Failed experiments (<code>docs/EXPERIMENTS.md</code>).</strong> Nearest-training-text label agreement could not separate honest hard tickets (0.29) from noisy ones (0.22), so it was replaced by top-5 coverage. A bigger network (128 numbers per word) scored lower than the 64 version. Training first ran on all CPU threads and took over 5 minutes on tiny matrices; one thread brought all three variants under a minute.</p>
+<hr />
+<h2 id="7-honest-limitations-and-how-to-say-them">7. Honest limitations and how to say them</h2>
+<h3 id="71-the-list">7.1 The list</h3>
+<ul>
+<li>Short English questions (median about 10 words), not long complaints; no real personal data in them.</li>
+<li>Team and urgency are my rubric, not labels from the dataset or from a bank.</li>
+<li>Label noise: an audit disagreed with 12 of 150 sampled training labels (8%).</li>
+<li>Near-duplicates: 351 of 3,080 test rows (11.4%) have a training text with <strong>cosine similarity</strong> (how alike two texts' word vectors point, 0 to 1) above 0.9. The test set is official and frozen, so they stay. Before the fix, Q1 checked a narrower set (89 test rows with almost the same words as a train row): a plain TF-IDF model got 0.978 accuracy on them against 0.872 on the rest, yet dropping them moved test macro-F1 only from 0.876 to 0.873.</li>
+<li>One test set is reused by every retrain gate decision; over many rounds that slowly overfits to it.</li>
+<li>Temperature and thresholds share the validation set.</li>
+<li>Review data is a biased sample: only uncertain tickets get reviewed.</li>
+<li>PII is pattern-based. The last fix round added Aadhaar (Verhoeff-checked), PAN, UPI ids and written-out emails, but any format nobody wrote a pattern for (a passport number, for example) is not masked. A phone written right after "paid" is left alone on purpose (it looks like an amount).</li>
+<li>Chunked request bodies skip the 20 kB size check (text is still limited to 2,000 characters).</li>
+<li>SQLite: one writer at a time. Q3 load test: 1 client p50 8.6 ms; 32 clients p50 164 ms, p95 720 ms, zero errors in 1,400 requests.</li>
+<li>No login: anyone with the link can review.</li>
+<li>Free hosting sleeps and wipes the disk; reviews on the free host are lost on restart.</li>
+<li>The Docker image was not built here (no Docker daemon). Deployment needs your own accounts.</li>
+<li>One known small bug is still marked as an expected failure: PSI on a constant reference gives one bin and always scores 0 (<code>test_audit_q2.py</code>). It does not affect the four live indicators.</li>
+</ul>
+<h3 id="72-how-to-say-each-weakness-out-loud">7.2 How to say each weakness out loud</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Weakness</th>
+<th>Say this</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>The network lost</td>
+<td>"I built a PyTorch model and it lost by 1.4 macro-F1 points. I wrote the decision rule before seeing results, so I reported the loss and kept the simpler model. With 90 short examples per class, word features are hard to beat."</td>
+</tr>
+<tr>
+<td>Rubric, not labels</td>
+<td>"The dataset gives intents. Teams and urgency are a table I wrote. So my team and urgency scores measure agreement with my table. In a real bank, the table would come from operations, and overrides tell you where it is wrong."</td>
+</tr>
+<tr>
+<td>Short English data</td>
+<td>"Banking77 is short English questions. Real complaints are longer and mixed language. I measured that gap with a Hinglish set and a typo set instead of hiding it."</td>
+</tr>
+<tr>
+<td>Hinglish</td>
+<td>"On 60 Hinglish messages, 26 went to a person, none went silently to the wrong team, and one got the wrong intent in the right team. It is a small sample. The fix is Hinglish training data, not a bigger threshold."</td>
+</tr>
+<tr>
+<td>Near-duplicates</td>
+<td>"About 11% of test rows have a close paraphrase in training. I could not drop them because the test set is official, so I documented it. On the closest copies an audit found the score barely moves without them, but I would not claim that for all 351."</td>
+</tr>
+<tr>
+<td>Calibration</td>
+<td>"The raw model was under-confident: 74% average confidence, 90% accuracy. One temperature fixed it, ECE 0.16 to 0.015. I fitted it on the same validation set as the thresholds, which I would split in a stricter setup."</td>
+</tr>
+<tr>
+<td>Reused test set</td>
+<td>"Every gate decision uses the same test set. That is fine for a few rounds; over many it overfits. Production needs a fresh labelled sample each month."</td>
+</tr>
+<tr>
+<td>PII gaps</td>
+<td>"Redaction is pattern-based: emails, UPI ids, phones, cards with Luhn, Aadhaar with Verhoeff, PAN, account numbers. Anything without a pattern, like a passport number, is not caught. Adding a pattern is a few lines plus a test; I practised it with passports."</td>
+</tr>
+<tr>
+<td>Chunked bodies</td>
+<td>"The 20 kB limit reads the Content-Length header. A chunked request has none, so it is read fully and then refused by the 2,000-character rule. A streaming limit in middleware would close that."</td>
+</tr>
+<tr>
+<td>Docker not verified</td>
+<td>"The sandbox had no Docker daemon, so I could not build the image. The same app runs with <code>make serve</code>, and the Space bundle was tested by running it from its own folder."</td>
+</tr>
+<tr>
+<td>Built with AI tools</td>
+<td>See question Q60 in section 10.</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="73-what-production-would-need">7.3 What production would need</h3>
+<p>Authentication and reviewer roles; PostgreSQL; a message queue for bursts; streaming body limits; PII patterns reviewed by a privacy team (or a pattern plus entity-recogniser mix); a fresh labelled test sample per period; real team and urgency labels from the operations team; alerting on drift; per-language models or Hinglish training data; audit retention rules.</p>
+<hr />
+<h2 id="8-job-description-line-evidence-in-sanket">8. Job description line → evidence in SANKET</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>JD line</th>
+<th>Where to point</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Implement ML and AI models</td>
+<td><code>sanket/models/baseline.py</code>, <code>sanket/models/nn/</code></td>
+</tr>
+<tr>
+<td>Production-ready components</td>
+<td><code>Classifier</code> interface, versioned artifacts, <code>artifacts/registry.json</code>, model cards</td>
+</tr>
+<tr>
+<td>Integrate models with APIs and data pipelines</td>
+<td><code>sanket/api/</code>, <code>sanket/service.py: process_ticket</code></td>
+</tr>
+<tr>
+<td>Deployment on cloud</td>
+<td><code>Dockerfile</code>, <code>make space-bundle</code>, <code>web/vercel.json</code>, <code>docs/DEPLOY.md</code>, replay fallback</td>
+</tr>
+<tr>
+<td>Monitoring and drift</td>
+<td><code>sanket/monitoring/drift.py</code>; override rate in <code>sanket/sql/metrics.sql</code></td>
+</tr>
+<tr>
+<td>Feature pipelines, preprocessing</td>
+<td><code>sanket/pipeline/</code>; one <code>clean()</code> for train and serve</td>
+</tr>
+<tr>
+<td>Data reliability</td>
+<td><code>sanket/pipeline/quality.py</code>; 422 on bad input</td>
+</tr>
+<tr>
+<td>Functional testing of AI components</td>
+<td><code>tests/</code> (232 passing), <code>web/e2e/</code>, ONNX parity test</td>
+</tr>
+<tr>
+<td>Performance and latency</td>
+<td><code>make bench</code>, <code>docs/bench.md</code></td>
+</tr>
+<tr>
+<td>Debugging inference</td>
+<td><code>docs/AUDIT_LOG.md</code> (the eight-times speed bug), per-stage timings in the trace</td>
+</tr>
+<tr>
+<td>Collaboration with QA</td>
+<td>three audit gates, handoff notes, contracts file</td>
+</tr>
+<tr>
+<td>Documentation</td>
+<td>README, ARCHITECTURE, GLOSSARY, model cards, this guide</td>
+</tr>
+<tr>
+<td>Security, privacy</td>
+<td>redaction before storage, no raw text in logs, input limits, CORS allow-list, no pickle from users</td>
+</tr>
+<tr>
+<td>Python, a bit of JavaScript</td>
+<td>Python 3.11 back end; React dashboard in plain JavaScript</td>
+</tr>
+<tr>
+<td>DSA</td>
+<td>Luhn, hash-map vocabulary, heap for top-k, sort-and-walk KS, priority-ordered queue</td>
+</tr>
+<tr>
+<td>OOP</td>
+<td><code>Classifier</code> protocol with two implementations, dataclasses, Pydantic schemas, custom exceptions</td>
+</tr>
+<tr>
+<td>DBMS, SQL</td>
+<td>4 tables, foreign keys, index, unique constraint, transaction, hand-written SQL</td>
+</tr>
+<tr>
+<td>Statistics, probability</td>
+<td>softmax, summed probabilities, precision/recall, calibration, PSI, KS</td>
+</tr>
+<tr>
+<td>Linear algebra</td>
+<td>TF-IDF vector × weight matrix; embedding average and layers</td>
+</tr>
+<tr>
+<td>NumPy, pandas, scikit-learn, PyTorch</td>
+<td>drift maths, data pipeline, baseline, IntentNet</td>
+</tr>
+<tr>
+<td>Git, REST</td>
+<td>wave-by-wave history, CI; REST with 201/404/409/422</td>
+</tr>
+<tr>
+<td>Responsible AI</td>
+<td>human in the loop, override log, promote gate, Hinglish failure report, rubric disclaimer</td>
+</tr>
+<tr>
+<td>Resilience when experiments fail</td>
+<td><code>docs/EXPERIMENTS.md</code>; the network result reported though it lost</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2 id="9-four-minute-demo-script">9. Four-minute demo script</h2>
+<p>Before the interview: open the live link 10 minutes early to wake the free API. Have a terminal ready with <code>make serve</code> and <code>make web</code> in case the network fails.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Time</th>
+<th>Do</th>
+<th>Say</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0:00</td>
+<td>Open the page; point at the seven cards</td>
+<td>"A message goes left to right through seven steps. Each card is one small file."</td>
+</tr>
+<tr>
+<td>0:20</td>
+<td>Click chip <strong>Urgent fraud</strong></td>
+<td>"It predicted card_payment_not_recognised at 79%. The six fraud intents add up to 97%, so the team is clear, and it is marked urgent. A few milliseconds in total."</td>
+</tr>
+<tr>
+<td>0:50</td>
+<td>Click the <strong>Explain</strong> card</td>
+<td>"These words pushed the decision: 'payment', 'make', 'this payment', 'did not', 'someone'. Each number is weight times TF-IDF value, so it is exact."</td>
+</tr>
+<tr>
+<td>1:15</td>
+<td>Chip <strong>Fake PII</strong>, open <strong>Clean</strong></td>
+<td>"The card number and email became [CARD] and [EMAIL] before anything was stored. The card check uses the Luhn checksum."</td>
+</tr>
+<tr>
+<td>1:40</td>
+<td>Chip <strong>Ambiguous</strong> ("I tried to pay and it did not work")</td>
+<td>"Team confidence is 0.69, just under 0.70, so it goes to a person."</td>
+</tr>
+<tr>
+<td>1:55</td>
+<td>Review queue → <strong>Review</strong> → override → save</td>
+<td>"My correction is logged with who and when, and becomes training data. A second save would get 409."</td>
+</tr>
+<tr>
+<td>2:20</td>
+<td>Chip <strong>Hinglish</strong></td>
+<td>"Trained on English, so it is weak here. Many words are unknown, so it asks a person. On 60 Hinglish messages, 26 went to a person, none silently to the wrong team."</td>
+</tr>
+<tr>
+<td>2:45</td>
+<td>Monitor → <strong>Simulate Hinglish surge</strong></td>
+<td>"PSI and KS compare live tickets with validation tickets. The unknown-word signal jumps to red. Red means look before trusting the model." Then click <strong>Reset</strong>.</td>
+</tr>
+<tr>
+<td>3:15</td>
+<td>Model panel, scroll to the LR-versus-NN table and registry</td>
+<td>"I built a PyTorch model; it is 15 times faster but 1.4 points less accurate, so the simple model serves. Retraining is gated: in the audit a poisoned retrain was rejected and an honest one promoted."</td>
+</tr>
+<tr>
+<td>3:40</td>
+<td>Open any card's <strong>Code</strong> tab</td>
+<td>"And this is the real code behind the card, read from the running function."</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Fallback if the badge says Replay.</strong> Say: "The free server is asleep; these are recorded answers from the same API." Carry on with the chips; they all work. The review form works in this tab only. Free text is off in Replay.</p>
+<p><strong>Fallback if there is no network.</strong> Run <code>make serve</code> in one terminal and <code>VITE_API_URL=http://localhost:8000 make web</code> in another, then open http://localhost:5173.</p>
+<p><strong>Note.</strong> The committed registry has only v1. If asked to show a rejected candidate, open <code>tests/model/test_quality_gates.py</code> and explain the poisoned-label test, or quote the audit: 30% poisoned labels rejected at 57% top-5 coverage.</p>
+<hr />
+<h2 id="10-question-bank-66-questions">10. Question bank (66 questions)</h2><div class="tools"><button type="button" onclick="setAll(true)">Open all answers</button><button type="button" onclick="setAll(false)">Close all answers</button></div>
+<p>Click a question to see a model answer. Say it in your own words.</p>
+<h3 id="a-this-project">A. This project</h3>
+<details class="q" id="q1-what-does-sanket-do-in-one-sentence"><summary>Q1. What does SANKET do, in one sentence?</summary><p>It reads a bank customer's message, hides personal data, predicts the intent, routes it to a team with an urgency, and asks a person when it is unsure.</p></details>
+<details class="q" id="q2-why-ticket-triage"><summary>Q2. Why ticket triage?</summary><p>It is the smallest complete AI system that needs data checks, a model, an API, a human in the loop, monitoring and safe updates. It also matches the kind of support and banking work Tech Mahindra describes publicly.</p></details>
+<details class="q" id="q3-where-does-the-data-come-from"><summary>Q3. Where does the data come from?</summary><p>Banking77, from PolyAI (2020), licence CC-BY-4.0. About 13,000 real customer-service messages to a bank, each with one of 77 intents.</p></details>
+<details class="q" id="q4-how-did-you-split-the-data"><summary>Q4. How did you split the data?</summary><p>Official test set kept frozen (3,080 rows). The official training set, minus copies of test texts, was split by intent into train 70% (6,946), validation 15% (1,489) and stream 15% (1,489). Seed 42, so the split is the same every time.</p></details>
+<details class="q" id="q5-what-is-the-stream-split-for"><summary>Q5. What is the stream split for?</summary><p>It feeds the live demo and the review queue. Keeping it separate means corrections used for retraining can never contain test rows.</p></details>
+<details class="q" id="q6-why-not-use-the-test-set-to-pick-thresholds"><summary>Q6. Why not use the test set to pick thresholds?</summary><p>Then the test score would be optimistic, because the settings were tuned to it. Thresholds are chosen on validation only.</p></details>
+<details class="q" id="q7-why-tf-idf-and-logistic-regression"><summary>Q7. Why TF-IDF and logistic regression?</summary><p>It is strong on short texts, trains in about a minute, answers in under a millisecond, and every prediction can be explained exactly as weight times feature value.</p></details>
+<details class="q" id="q8-what-features-does-the-model-use"><summary>Q8. What features does the model use?</summary><p>TF-IDF on words and word pairs (up to 8,000), and on 2 to 5 letter pieces inside words (up to 15,000). In total 20,672 features after removing terms seen in fewer than 2 messages.</p></details>
+<details class="q" id="q9-why-letter-pieces"><summary>Q9. Why letter pieces?</summary><p>They help with spelling variants and word forms. On validation they added about 0.02 macro-F1.</p></details>
+<details class="q" id="q10-how-did-you-choose-c"><summary>Q10. How did you choose C?</summary><p>I tried C = 5, 10 and 20, with and without letter pieces, on validation only. With letter pieces, C = 5 was best (0.8981).</p></details>
+<details class="q" id="q11-what-is-the-pytorch-model"><summary>Q11. What is the PyTorch model?</summary><p>IntentNet: one embedding of 64 numbers per word (plus hashed 3-letter pieces), averaged over the message, then a 128-unit layer with ReLU, then 77 scores. It is exported to ONNX so the server runs it without PyTorch.</p></details>
+<details class="q" id="q12-why-did-the-network-lose"><summary>Q12. Why did the network lose?</summary><p>About 90 training messages per intent, all short. Averaging vectors ignores word order. TF-IDF on words and letter pieces is a very strong fit for that size. The audit confirmed the comparison was fair.</p></details>
+<details class="q" id="q13-then-why-build-it"><summary>Q13. Then why build it?</summary><p>To compare honestly, to show I can train, export and benchmark a neural model, and because the rule was decided beforehand. It also serves as a second opinion in the Compare view.</p></details>
+<details class="q" id="q14-why-is-the-network-faster"><summary>Q14. Why is the network faster?</summary><p>It does a few hundred lookups and two small matrix multiplications. The baseline builds sparse TF-IDF vectors with 2 to 5 letter pieces, which is most of its 0.82 ms.</p></details>
+<details class="q" id="q15-why-sum-probabilities-per-team"><summary>Q15. Why sum probabilities per team?</summary><p>Because a message has one intent, intent probabilities in a team add up to the team's probability. A ticket can be unclear between two card intents but clearly a card ticket. Summing beat a direct team model: 0.9708 against 0.9636.</p></details>
+<details class="q" id="q16-how-is-urgency-decided"><summary>Q16. How is urgency decided?</summary><p>Summed probability of the 9 high-urgency intents. If it is at least 0.20, the ticket is high. Otherwise medium or low, whichever group sums higher.</p></details>
+<details class="q" id="q17-why-such-a-low-urgent-cut-off"><summary>Q17. Why such a low urgent cut-off?</summary><p>The rule was: catch at least 97% of urgent tickets on validation. Missing a fraud report is worse than a false alarm. On test: recall 0.983, precision 0.915.</p></details>
+<details class="q" id="q18-who-decided-which-intents-are-urgent"><summary>Q18. Who decided which intents are urgent?</summary><p>I did. It is the project's rubric, in <code>taxonomy.yaml</code>. The data audit listed debatable rows, such as <code>cancel_transfer</code> possibly being high.</p></details>
+<details class="q" id="q19-when-does-a-person-review-a-ticket"><summary>Q19. When does a person review a ticket?</summary><p>When team confidence is under 0.70, or when more than 20% of words are unknown and team confidence is under 0.97.</p></details>
+<details class="q" id="q20-how-did-you-choose-097"><summary>Q20. How did you choose 0.97?</summary><p>On a copy of validation data with 10% typos: the smallest human share where silently wrong-team tickets stay under 1%. It gave 35.6% to a person and 0.94% silent errors on validation typos.</p></details>
+<details class="q" id="q21-what-is-the-explanation-exactly"><summary>Q21. What is the explanation, exactly?</summary><p>For the predicted intent, the five terms with the largest weight × TF-IDF value. With the intercept they add up to the raw score. Letter pieces start with "~" and are hidden when they only repeat a shown word.</p></details>
+<details class="q" id="q22-why-not-shap-or-lime"><summary>Q22. Why not SHAP or LIME?</summary><p>They approximate a model's behaviour and are slow. For a linear model the exact answer is a dot product, so approximation adds nothing.</p></details>
+<details class="q" id="q23-how-do-you-stop-two-reviewers-deciding-the-same-ticket"><summary>Q23. How do you stop two reviewers deciding the same ticket?</summary><p>A transaction with a conditional update (only change status if not yet reviewed) plus a unique constraint on <code>reviews.ticket_id</code>. The second reviewer gets 409.</p></details>
+<details class="q" id="q24-how-is-personal-data-handled"><summary>Q24. How is personal data handled?</summary><p>Masked before storage, in the ticket and in reviewer notes. Raw text exists only in memory during the request. The audit checked the database, its side files, the server log and the replay file: zero hits.</p></details>
+<details class="q" id="q25-how-does-the-dashboard-work-without-the-api"><summary>Q25. How does the dashboard work without the API?</summary><p>It calls <code>/api/health</code> with a 4-second timeout. If that fails, it loads <code>web/public/replay.json</code>, which holds recorded real answers, shows an amber Replay badge, and retries in the background.</p></details>
+<details class="q" id="q26-how-long-does-one-request-take"><summary>Q26. How long does one request take?</summary><p><code>POST /api/tickets</code> p50 9.9 ms, p95 12.0 ms over 200 requests. Model work alone is about 1 ms; the rest is the database write and the web framework.</p></details>
+<details class="q" id="q27-how-do-you-know-the-tests-test-anything"><summary>Q27. How do you know the tests test anything?</summary><p>The audits wrote strict "expected to fail" tests for every finding. A fix had to turn them into passing tests. 232 tests pass now, with one known small finding still marked.</p></details>
+<details class="q" id="q28-what-would-you-do-with-the-overrides"><summary>Q28. What would you do with the overrides?</summary><p>Wrong intent → training data. Right intent but disputed urgency → change the table. The override rate per team, from SQL, shows where the model or the table is weakest.</p></details>
+<h3 id="b-machine-learning-basics">B. Machine learning basics</h3>
+<details class="q" id="q29-what-is-overfitting-and-how-did-you-limit-it"><summary>Q29. What is overfitting and how did you limit it?</summary><p>The model memorises training data and does worse on new data. Limits: regularisation (C), early stopping for the network, choosing settings on validation, and a frozen test set.</p></details>
+<details class="q" id="q30-precision-versus-recall"><summary>Q30. Precision versus recall?</summary><p>Precision: of what I flagged, how much was right. Recall: of what was really there, how much I caught. For fraud I want high recall.</p></details>
+<details class="q" id="q31-why-macro-f1-and-not-only-accuracy"><summary>Q31. Why macro-F1 and not only accuracy?</summary><p>Macro-F1 averages over classes, so small classes count equally. Here the test set is balanced (40 per intent), so both are 0.900, but on real data they differ.</p></details>
+<details class="q" id="q32-what-is-calibration-and-why-did-it-matter-here"><summary>Q32. What is calibration, and why did it matter here?</summary><p>Whether "90% confident" means right 90% of the time. Reviewers and thresholds read the confidence, so it must be honest. Before: ECE 0.160. After temperature scaling: 0.0146.</p></details>
+<details class="q" id="q33-what-does-temperature-scaling-change"><summary>Q33. What does temperature scaling change?</summary><p>Only the confidence, not the ranking. It divides the scores by one number fitted on validation data. Accuracy stays the same.</p></details>
+<details class="q" id="q34-what-is-cross-entropy"><summary>Q34. What is cross-entropy?</summary><p>Minus the log of the probability given to the right answer. Confident and wrong costs a lot. Logistic regression and the network both minimise it.</p></details>
+<details class="q" id="q35-difference-between-validation-and-test-sets"><summary>Q35. Difference between validation and test sets?</summary><p>Validation is for choosing settings. Test is for the final score, used once per decision. If you tune on test, the score lies.</p></details>
+<details class="q" id="q36-what-is-data-leakage-did-you-have-any"><summary>Q36. What is data leakage? Did you have any?</summary><p>Test information getting into training. Exact overlap was zero; 68 near-copies of test texts were removed from train. 351 test rows still have a close paraphrase in train (cosine above 0.9); this is documented.</p></details>
+<details class="q" id="q37-what-is-an-embedding"><summary>Q37. What is an embedding?</summary><p>A learned vector per word, so words used in similar ways end up with similar vectors.</p></details>
+<details class="q" id="q38-why-not-a-transformer-like-bert"><summary>Q38. Why not a transformer like BERT?</summary><p>No GPU, far larger than the free host allows, and I could not explain attention honestly in an interview. The point here was a system I fully understand.</p></details>
+<h3 id="c-statistics-and-linear-algebra">C. Statistics and linear algebra</h3>
+<details class="q" id="q39-explain-softmax"><summary>Q39. Explain softmax.</summary><p>Raise e to each score, divide by the sum. All outputs are positive and add up to 1. Bigger scores get bigger shares.</p></details>
+<details class="q" id="q40-explain-psi-with-numbers"><summary>Q40. Explain PSI with numbers.</summary><p>Reference 50/50, live 70/30. (0.2 × ln 1.4) + (−0.2 × ln 0.6) = 0.067 + 0.102 = 0.17, amber.</p></details>
+<details class="q" id="q41-explain-the-ks-test"><summary>Q41. Explain the KS test.</summary><p>Sort both samples, draw each one's cumulative share curve, and take the largest vertical gap, D. The p-value says how likely such a gap is by chance. Red needs D at least 0.2 and p under 0.01.</p></details>
+<details class="q" id="q42-what-is-a-p-value-simply"><summary>Q42. What is a p-value, simply?</summary><p>If nothing had changed, the chance of seeing a difference this big. Small p means "probably a real change".</p></details>
+<details class="q" id="q43-why-need-200-tickets-before-reporting-drift"><summary>Q43. Why need 200 tickets before reporting drift?</summary><p>With few points, big gaps happen by chance (5 + 5 numbers can give D = 0.8 with p = 0.08). Below 200 the report says <code>insufficient_data</code>.</p></details>
+<details class="q" id="q44-where-is-linear-algebra-in-this-project"><summary>Q44. Where is linear algebra in this project?</summary><p>TF-IDF vector (1 × 20,672) times the weight matrix (20,672 × 77) plus intercepts gives 77 scores. In the network: embedding lookup, average, then two matrix multiplications.</p></details>
+<h3 id="d-python-sql-rest-git-dsa-oop-dbms">D. Python, SQL, REST, Git, DSA, OOP, DBMS</h3>
+<details class="q" id="q45-write-sql-for-the-override-rate-per-team"><summary>Q45. Write SQL for the override rate per team.</summary><pre><code class="language-sql">SELECT p.team, AVG(CASE WHEN r.action = 'override' THEN 1.0 ELSE 0.0 END) AS rate, COUNT(*) AS n
+FROM reviews r JOIN predictions p ON p.ticket_id = r.ticket_id
+GROUP BY p.team ORDER BY p.team;
+</code></pre>
+<p>This is in <code>sanket/sql/metrics.sql</code>.</p></details>
+<details class="q" id="q46-write-sql-for-the-review-queue"><summary>Q46. Write SQL for the review queue.</summary><pre><code class="language-sql">SELECT t.id, t.text_redacted, p.urgency
+FROM tickets t JOIN predictions p ON p.ticket_id = t.id
+WHERE t.status = 'needs_review'
+ORDER BY CASE p.urgency WHEN 'high' THEN 0 WHEN 'medium' THEN 1 ELSE 2 END, t.created_at
+LIMIT 50;
+</code></pre></details>
+<details class="q" id="q47-why-an-index-on-status-created_at"><summary>Q47. Why an index on (status, created_at)?</summary><p>The queue filters by status and sorts by time. A combined index lets the database find and order those rows without scanning the whole table.</p></details>
+<details class="q" id="q48-what-is-a-foreign-key-here"><summary>Q48. What is a foreign key here?</summary><p><code>predictions.ticket_id</code> and <code>reviews.ticket_id</code> must point at an existing ticket. SQLite only checks this when <code>PRAGMA foreign_keys=ON</code>, which <code>db.py</code> sets on every connection.</p></details>
+<details class="q" id="q49-what-oop-ideas-are-used"><summary>Q49. What OOP ideas are used?</summary><p>A <code>Classifier</code> protocol (an interface) with two implementations, <code>BaselineModel</code> and <code>OnnxModel</code>. Dataclasses for <code>Thresholds</code>, <code>Decision</code>, <code>CleanResult</code>. Custom exceptions (<code>TicketNotFound</code>, <code>AlreadyReviewed</code>, <code>BadReview</code>) mapped to 404, 409 and 422.</p></details>
+<details class="q" id="q50-where-are-data-structures-used"><summary>Q50. Where are data structures used?</summary><p>Hash maps for the vocabulary and unknown-word check, a heap for top-k terms, sorting and binary search in KS, a priority order for the queue, and the Luhn loop.</p></details>
+<details class="q" id="q51-what-makes-an-api-restful-here"><summary>Q51. What makes an API RESTful here?</summary><p>URLs name resources (<code>/tickets/{id}</code>, <code>/tickets/{id}/review</code>), HTTP methods are the actions, and status codes carry meaning: 201, 404, 409, 422.</p></details>
+<details class="q" id="q52-is-post-tickets-idempotent"><summary>Q52. Is POST /tickets idempotent?</summary><p>No. Sending it twice creates two tickets. GET requests are idempotent. A review is effectively once-only: the second attempt gets 409.</p></details>
+<details class="q" id="q53-how-did-you-use-git"><summary>Q53. How did you use Git?</summary><p>Work landed in waves (scaffold, data, model, API, fixes), each a commit, with CI running lint and tests on every push. Audits and fixes are separate commits so the history shows what changed and why.</p></details>
+<h3 id="e-deployment-scaling-drift">E. Deployment, scaling, drift</h3>
+<details class="q" id="q54-how-is-it-deployed"><summary>Q54. How is it deployed?</summary><p>API: a Docker image on a free Hugging Face Space. Dashboard: Vercel. Both steps need my accounts; the guide is <code>docs/DEPLOY.md</code>. The image has no PyTorch: scikit-learn, onnxruntime, FastAPI and SQLite.</p></details>
+<details class="q" id="q55-what-happens-when-the-free-server-sleeps"><summary>Q55. What happens when the free server sleeps?</summary><p>The first request takes about a minute to wake it. The dashboard shows Replay meanwhile. The disk is wiped on restart, so the database is re-seeded and reviews are lost.</p></details>
+<details class="q" id="q56-how-would-you-handle-10000-tickets-a-minute"><summary>Q56. How would you handle 10,000 tickets a minute?</summary><p>That is about 170 per second. The model alone handles over 13,000 per second in batches, so the model is not the problem. SQLite with one writer is. I would move to PostgreSQL, run several API workers behind a load balancer, put a queue between intake and the model to absorb bursts, batch predictions, and add rate limits. Q3 measured that with 32 parallel clients, p95 latency rose to 720 ms on SQLite with zero errors, which shows where it starts to strain.</p></details>
+<details class="q" id="q57-what-is-the-difference-between-data-drift-and-concept-drift"><summary>Q57. What is the difference between data drift and concept drift?</summary><p>Data drift: inputs change (more Hinglish). Concept drift: the right answer for the same input changes (a new product makes "card" mean something else). Data drift is visible now; concept drift needs labels, so the override rate is the best early signal.</p></details>
+<details class="q" id="q58-when-would-you-retrain"><summary>Q58. When would you retrain?</summary><p>When drift stays red, when the override rate rises, or on a schedule once enough reviews exist (at least 50 new rows). Always through the gate.</p></details>
+<h3 id="f-responsible-ai-privacy-honesty">F. Responsible AI, privacy, honesty</h3>
+<details class="q" id="q59-what-responsible-ai-practices-are-in-sanket"><summary>Q59. What responsible-AI practices are in SANKET?</summary><p>Personal data masked before storage; a person decides uncertain cases; every override logged with who and when; urgency errs towards safety; a gate stops bad models; model cards state limits; failures (Hinglish, typos) are measured and published.</p></details>
+<details class="q" id="q60-was-this-built-with-ai-tools"><summary>Q60. Was this built with AI tools?</summary><p>Yes. I planned it and built it with AI coding agents working under my direction, in a multi-agent setup: builder agents wrote the code to a contract I set, separate auditor agents tried to break it, and a documentation agent wrote these guides. I chose the problem, the data, the rules (like "report the network even if it loses") and reviewed the results. I do not claim I typed every line. What I claim is that I understand every part, can verify it, and can change it, and I am happy to make a change live now.</p></details>
+<details class="q" id="q61-what-if-the-model-is-biased-against-some-customers"><summary>Q61. What if the model is biased against some customers?</summary><p>The data has no customer attributes, so I cannot measure group fairness directly. What I can measure is language: Hinglish performs worse. The design response is to send unfamiliar text to a person rather than guess, and to report the gap.</p></details>
+<details class="q" id="q62-what-personal-data-could-still-leak"><summary>Q62. What personal data could still leak?</summary><p>Anything with no pattern: passport numbers, names, addresses, and a phone written right after "paid" (treated as an amount on purpose). Audits pushed the coverage up from email, phone, card and account to also Aadhaar, PAN, UPI ids and written-out emails. In production I would combine patterns with a reviewed entity recogniser.</p></details>
+<h3 id="g-reflection">G. Reflection</h3>
+<details class="q" id="q63-what-would-you-improve-first"><summary>Q63. What would you improve first?</summary><p>Real or Hinglish training data; name and address masking; a second labelled test sample so the gate does not wear out one test set; login for reviewers; PostgreSQL.</p></details>
+<details class="q" id="q64-what-was-the-hardest-bug"><summary>Q64. What was the hardest bug?</summary><p>The retrain gate. The obvious fix (reject if the model disagrees a lot) blocked honest reviewers, because people only review hard tickets. The fix that worked was asking whether the label is in the model's top 5.</p></details>
+<details class="q" id="q65-what-did-you-learn"><summary>Q65. What did you learn?</summary><p>Measure before claiming: the "125 times faster" result was a bug. Pick decision rules before seeing results. And a simple model you can explain often beats a complex one on small data.</p></details>
+<details class="q" id="q66-why-should-we-trust-your-numbers"><summary>Q66. Why should we trust your numbers?</summary><p>Each number is in a model card, benchmark file or audit log, with a test or script that reproduces it. An audit re-ran training from scratch and got byte-identical model files.</p>
+<hr /></details>
+<h2 id="11-five-hands-on-exercises">11. Five hands-on exercises</h2>
+<p>Do these alone, on your laptop, in a Git branch (<code>git checkout -b practice</code>). Afterwards run <code>git checkout .</code> to undo. Each has an expected result so you can check yourself.</p>
+<h3 id="exercise-1-add-a-passport-redaction-with-a-test">Exercise 1: add a [PASSPORT] redaction with a test</h3>
+<p><strong>Task.</strong> First read how <code>[PAN]</code> is done in <code>sanket/pipeline/pii.py</code> (<code>PAN_RE</code> and the line in <code>redact</code>). Indian passport numbers look like <code>K1234567</code>: one letter, then 7 digits, the first of them not 0. Add the same kind of redaction for them.</p>
+<ol>
+<li>In <code>pii.py</code>, add <code>PASSPORT_RE = re.compile(r"(?i)(?&lt;![A-Za-z0-9])[A-Z][1-9]\d{6}(?![A-Za-z0-9])")</code>.</li>
+<li>In <code>redact</code>, add <code>"PASSPORT": 0</code> to <code>counts</code>, and a line like the PAN one: <code>text = PASSPORT_RE.sub(lambda m: _count(counts, "PASSPORT"), text)</code>.</li>
+<li><strong>Trap:</strong> <code>clean</code> lower-cases everything except known placeholders. Add <code>PASSPORT</code> to <code>_PLACEHOLDER</code> in <code>clean.py</code> and to <code>PLACEHOLDER</code> in <code>service.py</code>, or you will get <code>[passport]</code>.</li>
+<li>Add a test in <code>tests/unit/test_pii.py</code>.</li>
+</ol>
+<p><strong>Expected.</strong> <code>clean("My passport is K1234567").text == "my passport is [PASSPORT]"</code> and <code>pii == {"PASSPORT": 1}</code>. <code>make test</code> still passes: no data split and no probe row contains a passport-shaped string (checked). Today, without your change, the same text comes out as <code>my passport is k1234567</code>.</p>
+<h3 id="exercise-2-move-an-intent-to-another-team-and-re-evaluate">Exercise 2: move an intent to another team and re-evaluate</h3>
+<p><strong>Task.</strong> The data audit suggested <code>apple_pay_or_google_pay</code> and <code>supported_cards_and_currencies</code> belong in TRANSFERS_TOPUPS. Move both in <code>sanket/taxonomy.yaml</code>. No retraining is needed: the model predicts intents; only the sums change.</p>
+<p>Run:</p>
+<pre><code class="language-bash">.venv/bin/python -c &quot;
+from pathlib import Path; from sanket.models.baseline import BaselineModel
+from sanket.models.evaluate import load_split; from sanket.routing.thresholds import team_matrix
+from sanket.taxonomy import TEAM_NAMES, team_of; import numpy as np
+m = BaselineModel.load(Path('artifacts/models/v1'))
+for s in ['val', 'test']:
+    d = load_split(s); tm = team_matrix(m.predict_proba(d.text.tolist()))
+    pred = np.array(TEAM_NAMES)[tm.argmax(1)]; true = np.array([team_of(i) for i in d.intent])
+    print(s, round((pred == true).mean(), 4))&quot;
+</code></pre>
+<p><strong>Expected.</strong> Before: val 0.9691, test 0.9705. After moving both: val 0.9691, test 0.9714. A reorganisation is a table edit, not a retrain. (<code>tests/unit/test_scaffold.py</code> still passes; it checks counts, not membership.)</p>
+<h3 id="exercise-3-change-tau_team-and-read-the-coverage-table">Exercise 3: change tau_team and read the coverage table</h3>
+<p><strong>Task.</strong> Open <code>artifacts/models/v1/card.json</code>, find <code>metrics.test.coverage_table</code>. Then set <code>tau_team</code> to 0.8 in <code>artifacts/models/v1/thresholds.json</code>, restart <code>make serve</code>, and submit "I tried to pay and it did not work".</p>
+<p><strong>Expected.</strong> From the table: at 0.7, 94.4% auto-routed at 0.992 team accuracy; at 0.8, 92.2% at 0.995. A higher cut-off means more work for people and fewer mistakes. The ambiguous message (team confidence 0.69) still goes to a person. Explain why validation chose 0.70: it is the smallest step where auto-routed validation accuracy reached 0.985 (0.9852).</p>
+<h3 id="exercise-4-add-a-fifth-drift-indicator">Exercise 4: add a fifth drift indicator</h3>
+<p><strong>Task.</strong> Add a KS indicator on <code>n_chars</code> (message length in characters).</p>
+<ol>
+<li>In <code>sanket/models/train_baseline.py: reference_from_val</code>, add <code>"n_chars": [len(t) for t in val["text"]]</code>.</li>
+<li>In <code>sanket/api/queries.py: live_inputs</code>, select <code>Ticket.n_chars</code> and return it.</li>
+<li>In <code>drift.py: drift_report</code>, loop over <code>("n_tokens", "oov_rate", "team_conf", "n_chars")</code>, skipping a key missing from <code>reference</code> so old reference files still work.</li>
+<li>Add a unit test in <code>tests/unit/test_drift.py</code> with synthetic data.</li>
+</ol>
+<p><strong>Expected.</strong> With <code>rng = np.random.default_rng(42)</code>, reference <code>rng.normal(60, 15, 500)</code> and then live <code>rng.normal(75, 15, 500)</code>: D = 0.422, p ≈ 0, status red. The report now has 5 indicators. Run <code>make train</code> to refresh <code>reference.json</code>.</p>
+<h3 id="exercise-5-sql-for-reviews-per-reviewer">Exercise 5: SQL for reviews per reviewer</h3>
+<p><strong>Task.</strong> After <code>make seed</code>, write:</p>
+<pre><code class="language-sql">SELECT reviewer, COUNT(*) AS n,
+       ROUND(AVG(CASE WHEN action = 'override' THEN 1.0 ELSE 0.0 END), 2) AS override_rate
+FROM reviews GROUP BY reviewer ORDER BY n DESC;
+</code></pre>
+<p>Run it with <code>.venv/bin/python -c "import sqlite3; print(sqlite3.connect('sanket.db').execute('''&lt;query&gt;''').fetchall())"</code>. Bonus: add it to <code>sanket/sql/metrics.sql</code> as <code>-- name: reviews_per_reviewer</code>.</p>
+<p><strong>Expected.</strong> <code>[('sim-reviewer', 12, 0.83)]</code>: the seed's simulated reviewer handled 12 tickets and changed 10. Then review one ticket in the dashboard as "me" and run it again: a second row appears.</p>
+<hr />
+<h2 id="12-five-day-study-plan-2-hours-a-day">12. Five-day study plan (2 hours a day)</h2>
+<p><strong>Day 1 — the story and the data.</strong>
+Read <code>EXPLAIN_LIKE_IM_5.md</code> (15 min). Say the 30-second pitch out loud five times (15 min). Read sections 1 to 3.1 of this guide (40 min). Open <code>pii.py</code> and do the Luhn example by hand (20 min). Run <code>make setup data train seed serve</code> and click every chip (30 min).</p>
+<p><strong>Day 2 — the model.</strong>
+Sections 3.2, 3.3, 4.1 to 4.8 (60 min), with paper for every worked example. Open <code>baseline.py</code> and <code>decide.py</code> and explain each function aloud (30 min). Exercise 2 (30 min).</p>
+<p><strong>Day 3 — review, monitor, retrain, API.</strong>
+Sections 3.4 to 3.7 and 4.9 to 4.14 (50 min). Read <code>review.py</code>, <code>drift.py: psi</code> and <code>retrain.py: gate</code> (30 min). Exercises 1 and 5 (40 min).</p>
+<p><strong>Day 4 — results, honesty, questions.</strong>
+Sections 5 to 8 (40 min). Practise the weakness table out loud (20 min). Answer questions Q1 to Q66 aloud, mark the ones you stumble on, re-read those parts (60 min).</p>
+<p><strong>Day 5 — demo and mock interview.</strong>
+Exercises 3 and 4 (40 min). Open the Tech Mahindra links in section 2 and write one sentence per page (20 min). Rehearse the demo with a timer three times, once in Replay mode (30 min). Timed mock: someone picks 10 random questions plus "walk me through your project"; record yourself and listen back (30 min).</p>
+<hr />
+<h2 id="13-company-sheet">13. Company sheet</h2>
+<p><strong>What you can say (public sources only).</strong> Read every link in section 2 first. Then connect, in your own words, only what the pages actually say:</p>
+<ul>
+<li>If the service-desk paper describes AI-assisted support: "Triage is the first step of a service desk: classify, route, escalate. SANKET is a small, honest version of that step."</li>
+<li>If the contact-centre case study is about a bank or complaint handling: "Banking complaints are the data I used."</li>
+<li>If the agentic-banking paper or the Orion release talks about guardrails or human oversight: "SANKET has a human in the loop, a promote gate and an override log, so I have built those ideas in miniature."</li>
+<li>If the VerifAI page is about validating AI: "My three audit gates and model cards are the same idea at project scale."</li>
+<li>If the Project Indus page talks about Indian languages: "My Hinglish stress test shows exactly why that work matters: my English model sends 26 of 60 Hinglish tickets to a person."</li>
+</ul>
+<p>Never say "Tech Mahindra uses X internally" or "your platform does Y" unless the page says it.</p>
+<p><strong>Five questions to ask the interviewer.</strong></p>
+<ol>
+<li>"In your support or service-desk projects, how do teams decide when a model's answer goes straight through and when a person reviews it?"</li>
+<li>"How do you handle Indian-language and code-mixed text, like Hinglish, in client projects?"</li>
+<li>"What does monitoring look like after an AI model goes live in a client project, and who acts on alerts?"</li>
+<li>"For a new AI engineer in Digital Catalyst, what does the first three months of work usually look like?"</li>
+<li>"How do your teams test and validate AI components before release?"</li>
+</ol>
+</main>
+<script>
+function setAll(open) { document.querySelectorAll('details.q').forEach(d => { d.open = open; }); }
+window.addEventListener('beforeprint', () => setAll(true));
+</script>
+</body>
+</html>
