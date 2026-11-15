@@ -16,8 +16,16 @@ from sklearn.metrics import f1_score
 
 from sanket.config import Settings
 from sanket.models.baseline import BaselineModel, BaselineParams, fit_temperature
-from sanket.models.evaluate import evaluate_all, expected_calibration_error, load_split, score_texts
+from sanket.models.evaluate import (
+    evaluate_all,
+    expected_calibration_error,
+    load_split,
+    score_texts,
+    stress_from_scores,
+    typo_texts,
+)
 from sanket.pipeline.clean import clean
+from sanket.routing.decide import Thresholds
 from sanket.routing.thresholds import choose_thresholds, save_thresholds, team_matrix
 from sanket.taxonomy import INTENTS, TEAM_NAMES
 
@@ -63,6 +71,32 @@ def reference_from_val(model: BaselineModel, val: pd.DataFrame, proba: np.ndarra
     }
 
 
+OOV_CONF_CANDIDATES = [round(0.80 + 0.01 * k, 2) for k in range(21)]  # 0.80 .. 1.00; 1.00 = always escalate
+TYPO_SEED = 1042  # fixed so the choice is reproducible; the test typo set uses seed 42
+
+
+def choose_oov_conf(model: BaselineModel, val: pd.DataFrame, th: Thresholds) -> dict:
+    """Pick oov_conf on a typo copy of val: lowest human share with silent wrong-team under 1%.
+
+    Larger values send more noisy tickets to a human, so human share only falls as the value
+    falls; the first (smallest) value meeting the 1% limit is therefore the cheapest safe one.
+    If none meets it, take the value with the fewest silent wrong-team tickets.
+    """
+    texts = typo_texts(val["text"].tolist(), TYPO_SEED)
+    proba, oov = score_texts(model, texts)
+    rows = []
+    for c in OOV_CONF_CANDIDATES:
+        trial = Thresholds(th.tau_team, th.tau_high, th.oov_max, c)
+        m = stress_from_scores(proba, oov, val["intent"].tolist(), trial)
+        rows.append({"oov_conf": c, "human_share": m["human_share"], "silent_wrong_team": m["silent_wrong_team"]})
+    ok = [r for r in rows if r["silent_wrong_team"] < 0.01]
+    best = min(ok, key=lambda r: (r["human_share"], r["oov_conf"])) if ok else min(
+        rows, key=lambda r: r["silent_wrong_team"])
+    return {"chosen": best["oov_conf"], "val_typo_human_share": best["human_share"],
+            "val_typo_silent_wrong_team": best["silent_wrong_team"],
+            "rule": "silent wrong-team < 1%, lowest human share", "typo_seed": TYPO_SEED, "table": rows}
+
+
 def code_version() -> str:
     """Short git hash of the code, or 'unknown' outside a git checkout."""
     try:
@@ -81,6 +115,8 @@ def package_version(train: pd.DataFrame, val: pd.DataFrame, params: BaselinePara
     model.temperature = fit_temperature(model.scores(val["text"].tolist()), val_y)
     proba, oov = score_texts(model, val["text"].tolist())
     th = choose_thresholds(proba, oov, val["intent"].tolist())
+    oov_choice = choose_oov_conf(model, val, th)
+    th.oov_conf = oov_choice["chosen"]
     out_dir.mkdir(parents=True, exist_ok=True)
     model.save(out_dir)
     save_thresholds(th, out_dir)
@@ -102,6 +138,7 @@ def package_version(train: pd.DataFrame, val: pd.DataFrame, params: BaselinePara
         ],
         "model_file_mb": round((out_dir / "model.joblib").stat().st_size / 1e6, 2),
     }
+    card["oov_conf_selection"] = oov_choice
     card["calibration"] = calibration_summary(model, val, card["metrics"])
     card.update(extra_card or {})
     (out_dir / "card.json").write_text(json.dumps(card, indent=2), encoding="utf-8")
