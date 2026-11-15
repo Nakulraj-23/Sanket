@@ -2,5 +2,5 @@
   "tau_team": 0.7,
   "tau_high": 0.2,
   "oov_max": 0.2,
-  "oov_conf": 0.98
+  "oov_conf": 0.97
 }

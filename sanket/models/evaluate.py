@@ -100,12 +100,17 @@ def evaluate_frame(model: Classifier, df: pd.DataFrame, th: Thresholds) -> dict:
 def stress_metrics(model: Classifier, texts: list[str], y_intent: list[str], th: Thresholds) -> dict:
     """Accuracy, share sent to a human, and silent failures (wrong AND auto-routed) on a stress set."""
     proba, oov = score_texts(model, texts)
+    return stress_from_scores(proba, oov, y_intent, th)
+
+
+def stress_from_scores(proba: np.ndarray, oov: np.ndarray, y_intent: list[str], th: Thresholds) -> dict:
+    """Same numbers as stress_metrics, from probabilities that were already computed."""
     decs = _decisions(proba, oov, th)
     auto = np.array([d.decision == "auto" for d in decs])
     intent_ok = np.array([d.intent == y for d, y in zip(decs, y_intent)])
     team_ok = np.array([d.team == team_of(y) for d, y in zip(decs, y_intent)])
     return {
-        "n": len(texts),
+        "n": len(y_intent),
         "intent_accuracy": float(intent_ok.mean()),
         "team_accuracy": float(team_ok.mean()),
         "human_share": float(1 - auto.mean()),
@@ -114,13 +119,18 @@ def stress_metrics(model: Classifier, texts: list[str], y_intent: list[str], th:
     }
 
 
+def typo_texts(texts: list[str], seed: int) -> list[str]:
+    """Copies of `texts` with 10% character noise, one seed per row (seed + row number)."""
+    return [clean(add_typos(t, 0.1, seed + i)).text for i, t in enumerate(texts)]
+
+
 def evaluate_stress(model: Classifier, th: Thresholds, test: pd.DataFrame) -> dict:
     """Typo test set (10% character noise, seed 42) and the Hinglish stress file."""
-    typo_texts = [clean(add_typos(t, 0.1, 42 + i)).text for i, t in enumerate(test["text"])]
+    typo_texts_test = typo_texts(test["text"].tolist(), 42)
     hing = pd.read_csv(Settings().data_dir / "stress" / "hinglish.csv")
     hing_texts = [clean(t).text for t in hing["text"]]
     return {
-        "typos_10pct": stress_metrics(model, typo_texts, test["intent"].tolist(), th),
+        "typos_10pct": stress_metrics(model, typo_texts_test, test["intent"].tolist(), th),
         "hinglish": stress_metrics(model, hing_texts, hing["intent"].tolist(), th),
     }
 

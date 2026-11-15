@@ -9,8 +9,9 @@ import pytest
 
 from sanket.config import ROOT, Settings
 from sanket.models.baseline import BaselineModel
-from sanket.models.evaluate import evaluate_frame, load_split
+from sanket.models.evaluate import evaluate_frame, load_split, score_texts
 from sanket.retrain import best_ever_problems, flip_labels, gate, label_sanity_problems, run_retrain
+from sanket.routing.decide import decide
 from sanket.routing.thresholds import load_thresholds
 
 ART = ROOT / "artifacts"
@@ -109,10 +110,35 @@ def test_all_wrong_reviews_are_rejected(scratch_artifacts) -> None:
     assert json.loads((scratch_artifacts / "registry.json").read_text())["champion"] == "v1"
 
 
-def test_label_sanity_accepts_honest_and_rejects_noisy(champion: dict) -> None:
-    rows = load_split("stream").head(200)[["text", "intent"]]
+def human_routed_stream(champion: dict) -> pd.DataFrame:
+    """The stream tickets the champion sends to a human, with their true labels: what reviewers really see."""
+    stream = load_split("stream")
+    proba, oov = score_texts(champion["model"], stream["text"].tolist())
+    human = [decide(proba[i], oov[i], champion["th"]).decision == "human" for i in range(len(stream))]
+    return stream[human][["text", "intent"]].reset_index(drop=True)
+
+
+def test_label_sanity_accepts_true_labels_of_human_routed_tickets(champion: dict) -> None:
+    rows = human_routed_stream(champion)
+    assert len(rows) > 50
     assert label_sanity_problems(champion["model"], rows) == []
-    assert label_sanity_problems(champion["model"], flip_labels(rows, 0.5))
+
+
+def test_label_sanity_accepts_true_labels_of_random_tickets(champion: dict) -> None:
+    rows = load_split("stream").sample(200, random_state=1)[["text", "intent"]]
+    assert label_sanity_problems(champion["model"], rows) == []
+
+
+def test_label_sanity_rejects_all_wrong_labels(champion: dict) -> None:
+    rows = load_split("stream").sample(200, random_state=8)[["text", "intent"]]
+    assert label_sanity_problems(champion["model"], flip_labels(rows, 1.0))
+
+
+def test_label_sanity_rejects_30_percent_label_noise(champion: dict) -> None:
+    random_rows = load_split("stream").sample(200, random_state=1)[["text", "intent"]]
+    for seed in range(3):
+        assert label_sanity_problems(champion["model"], flip_labels(random_rows, 0.3, seed))
+        assert label_sanity_problems(champion["model"], flip_labels(human_routed_stream(champion), 0.3, seed))
 
 
 def test_best_ever_check_stops_the_slack_ratchet() -> None:
@@ -131,3 +157,15 @@ def test_calibration_in_card(champion: dict) -> None:
 def test_duplicate_reviews_do_not_count_as_new(scratch_artifacts) -> None:
     copies = load_split("train").head(60)[["text", "intent"]]
     assert run_retrain(copies, min_new=50)["status"] == "skipped"
+
+
+def test_oov_conf_is_selected_on_val_typos_and_stored(champion: dict) -> None:
+    sel = champion["card"]["oov_conf_selection"]
+    assert sel["chosen"] == champion["th"].oov_conf and sel["val_typo_silent_wrong_team"] < 0.01
+    cheaper = [r for r in sel["table"] if r["oov_conf"] < sel["chosen"]]
+    assert all(r["silent_wrong_team"] >= 0.01 for r in cheaper)
+
+
+def test_honest_human_routed_batch_is_promoted_end_to_end(scratch_artifacts, champion: dict) -> None:
+    result = run_retrain(human_routed_stream(champion), min_new=50)
+    assert result["promoted"] is True, result["reasons"]

@@ -26,40 +26,54 @@ MACRO_F1_SLACK = 0.005
 HIGH_RECALL_SLACK = 0.01
 MAX_FILE_MB = 10.0
 MAX_TOTAL_MB = 40.0
-MAX_DISAGREEMENT = 0.30  # reviews the champion disagrees with: honest reviews sit near 0.10-0.25
+MIN_TOP5_COVERAGE = 0.75  # honest batches score 0.86 or more, 30% noise 0.72 or less (measured)
+VAL_SLACK = 0.01  # val has half the rows of test, so its macro-F1 is noisier: allow twice the slack
 BEST_EVER_SLACK = 0.01  # slack is measured from the best promoted model too, so it cannot ratchet down
 
 
-def gate(champion: dict, candidate: dict) -> tuple[bool, list[str]]:
+def gate(champion: dict, candidate: dict, slack: float = MACRO_F1_SLACK,
+         recall_slack: float = HIGH_RECALL_SLACK) -> tuple[bool, list[str]]:
     """Promote rule on test metrics: macro-F1 within 0.005 and high-urgency recall within 0.01.
 
     Each argument has `intent_macro_f1` and `high_recall`. Returns (promote, reasons for refusal).
     """
     reasons = []
-    if candidate["intent_macro_f1"] < champion["intent_macro_f1"] - MACRO_F1_SLACK:
+    if candidate["intent_macro_f1"] < champion["intent_macro_f1"] - slack:
         reasons.append(
-            f"macro-F1 {candidate['intent_macro_f1']:.4f} is more than {MACRO_F1_SLACK} below "
+            f"macro-F1 {candidate['intent_macro_f1']:.4f} is more than {slack} below "
             f"champion {champion['intent_macro_f1']:.4f}")
-    if candidate["high_recall"] < champion["high_recall"] - HIGH_RECALL_SLACK:
+    if candidate["high_recall"] < champion["high_recall"] - recall_slack:
         reasons.append(
-            f"high-urgency recall {candidate['high_recall']:.4f} is more than {HIGH_RECALL_SLACK} below "
+            f"high-urgency recall {candidate['high_recall']:.4f} is more than {recall_slack} below "
             f"champion {champion['high_recall']:.4f}")
     return (not reasons), reasons
 
 
-def label_sanity_problems(champion: BaselineModel, new_rows: pd.DataFrame) -> list[str]:
-    """Reject if the current champion disagrees with more than 30% of the new reviewed labels.
+def top5_coverage(champion: BaselineModel, new_rows: pd.DataFrame) -> float:
+    """Share of new labels that are among the champion's five most likely intents for that text."""
+    proba = champion.predict_proba(new_rows["text"].tolist())
+    idx = np.array([INTENTS.index(i) for i in new_rows["intent"]])
+    rank = (proba > proba[np.arange(len(proba)), idx][:, None]).sum(axis=1)
+    return float((rank < 5).mean())
 
-    An honest reviewer overrides the model on hard tickets, so some disagreement is normal;
-    a batch where most labels are wrong looks very different.
+
+def label_sanity_problems(champion: BaselineModel, new_rows: pd.DataFrame) -> list[str]:
+    """Reject a batch whose labels are rarely among the model's five best guesses.
+
+    Why this and not "does the model agree": people only review the tickets the model is
+    unsure about, so an honest reviewer often disagrees with its first guess (56% on the 86
+    human-routed stream tickets). But even there the true label is still in the top five 86%
+    of the time, while a wrong label is there only about 6% of the time (5 of 77). Measured on
+    stream data: honest 0.86 to 0.97, 30% wrong labels 0.58 to 0.72, all wrong 0.05. The limit
+    0.75 sits between them. (Agreement with the nearest training text was tried first and
+    could not separate honest hard tickets, 0.29, from noisy ones, 0.22; see EXPERIMENTS.md.)
     """
     if new_rows.empty:
         return []
-    pred = np.array(INTENTS)[champion.predict_proba(new_rows["text"].tolist()).argmax(axis=1)]
-    rate = float((pred != new_rows["intent"].to_numpy()).mean())
-    if rate > MAX_DISAGREEMENT:
-        return [(f"label sanity: champion disagrees with {rate:.0%} of {len(new_rows)} new reviews "
-                f"(limit {MAX_DISAGREEMENT:.0%})")]
+    share = top5_coverage(champion, new_rows)
+    if share < MIN_TOP5_COVERAGE:
+        return [(f"label sanity: only {share:.0%} of {len(new_rows)} new labels are in the champion's "
+                f"top 5 (limit {MIN_TOP5_COVERAGE:.0%})")]
     return []
 
 
@@ -154,7 +168,7 @@ def run_retrain(new: pd.DataFrame, min_new: int = 50, sabotage: float = 0.0) -> 
                            {"retrained_on": {"new_reviewed_rows": n_new}})
     reasons += size_problems(art / "models" / version)
     ok, gate_reasons = gate(champ_card["metrics"]["test"], card["metrics"]["test"])
-    _, val_reasons = gate(champ_card["metrics"]["val"], card["metrics"]["val"])  # frozen val, same rule
+    _, val_reasons = gate(champ_card["metrics"]["val"], card["metrics"]["val"], VAL_SLACK, 2 * HIGH_RECALL_SLACK)  # frozen val, same rule
     reasons += gate_reasons + [f"val: {r}" for r in val_reasons]
     reasons += best_ever_problems(registry, card["metrics"]["test"])
     promoted = ok and not reasons

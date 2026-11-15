@@ -34,7 +34,7 @@ retrain:
 	@if [ -f sanket/retrain.py ]; then $(PY) -m sanket.retrain; else echo "not built yet"; fi
 
 serve:
-	@if [ -f sanket/api/app.py ]; then $(PY) -m uvicorn sanket.api.app:app --port $${PORT:-8000}; else echo "not built yet"; fi
+	@if [ -f sanket/api/app.py ]; then $(PY) -m uvicorn sanket.api.app:app --port $${PORT:-8000} --reload; else echo "not built yet"; fi
 
 web:
 	@if [ -f web/package.json ]; then cd web && npm run dev; else echo "not built yet"; fi
