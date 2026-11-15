@@ -20,7 +20,7 @@ train = ["torch==2.15.0", "onnx==1.23.2"]
 include = ["sanket*"]
 
 [tool.setuptools.package-data]
-sanket = ["taxonomy.yaml"]
+sanket = ["taxonomy.yaml", "sql/*.sql"]
 
 [tool.ruff]
 line-length = 100
