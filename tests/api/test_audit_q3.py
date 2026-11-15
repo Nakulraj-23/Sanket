@@ -44,14 +44,12 @@ def test_masked_formats_never_stored(client, raw, secret):
     assert secret not in db_dump(client)
 
 
-@pytest.mark.xfail(strict=True, reason="Q3 HIGH: tab/newline between card groups is not masked")
 @pytest.mark.parametrize("sep", ["\n", "\t", "\r\n"])
 def test_card_split_by_line_breaks_is_masked(client, sep):
     new_ticket(client, f"card 4012{sep}8888{sep}8888{sep}1881 was stolen")
     assert "4012 8888 8888 1881" not in db_dump(client)
 
 
-@pytest.mark.xfail(strict=True, reason="Q3 HIGH: review note is stored without redaction")
 def test_review_note_is_redacted(client):
     tid = new_ticket(client)
     note = "customer card 4111 1111 1111 1111, mail zara.khan@example.org"
@@ -61,14 +59,12 @@ def test_review_note_is_redacted(client):
     assert "4111 1111 1111 1111" not in dump and "zara.khan" not in dump
 
 
-@pytest.mark.xfail(strict=True, reason="Q3 MED: an empty reviewer makes an override unattributable")
 def test_empty_reviewer_refused(client):
     tid = new_ticket(client)
     r = client.post(f"/api/tickets/{tid}/review", json={"reviewer": " ", "action": "confirm"})
     assert r.status_code == 422
 
 
-@pytest.mark.xfail(strict=True, reason="Q3 MED: a lone surrogate gives an unhandled 500")
 def test_lone_surrogate_is_a_clean_error(client):
     r = client.post("/api/tickets", content=b'{"text": "card lost \\ud800 now"}',
                     headers={"content-type": "application/json"})
@@ -114,7 +110,6 @@ def capped(tmp_path, monkeypatch):
         yield c
 
 
-@pytest.mark.xfail(strict=True, reason="Q3 MED: the cap deletes human reviews with old tickets")
 def test_cap_keeps_reviews(capped):
     tid = new_ticket(capped)
     capped.post(f"/api/tickets/{tid}/review", json={"reviewer": "alice", "action": "confirm"})
@@ -123,7 +118,6 @@ def test_cap_keeps_reviews(capped):
     assert "alice" in db_dump(capped)
 
 
-@pytest.mark.xfail(strict=True, reason="Q3 MED: a client can post channel=seed and escape the cap")
 def test_client_cannot_escape_cap_with_seed_channel(capped):
     for _ in range(15):
         capped.post("/api/tickets", json={"text": "my card has not arrived", "channel": "seed"})

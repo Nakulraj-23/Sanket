@@ -178,6 +178,11 @@ def test_baseline_predict_has_no_per_call_matrix_copy(model) -> None:
     def fast(texts):
         return _softmax(np.asarray(model._features(texts) @ weights + model.intercept))
 
+    # structural check: the matrix is built once and kept (no per-call copy to time)
+    assert model._weights.flags.c_contiguous and model._weights.dtype == np.float64
+    assert np.allclose(model._weights, weights)
+    # relative timing, best of 3 interleaved rounds so CPU load hits both sides alike; loose 3x bound
     texts = load_split("test")["text"].tolist()[:300]
     _median_ms(model.predict_proba, texts[:30])
-    assert _median_ms(model.predict_proba, texts) < 1.5 * _median_ms(fast, texts)
+    ratios = [_median_ms(model.predict_proba, texts) / _median_ms(fast, texts) for _ in range(3)]
+    assert min(ratios) < 3.0

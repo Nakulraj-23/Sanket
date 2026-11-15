@@ -67,6 +67,16 @@ export const liveApi = {
   samples: () => [],
 }
 
+/** A queued ticket with no recorded sample: show what its own stored row says. */
+function fromQueueRow(q) {
+  if (!q) throw new Error('Ticket not found in replay data')
+  return {
+    ticket_id: q.ticket_id, created_at: q.created_at, status: q.status, text_redacted: q.text_redacted, trace: [], review: null,
+    prediction: { intent: q.intent, intent_conf: q.intent_conf, top_intents: [{ intent: q.intent, prob: q.intent_conf }],
+      team: q.team, team_conf: q.team_conf, urgency: q.urgency, decision: q.decision, reason: q.reason, top_terms: [] },
+  }
+}
+
 /** Replay source: same method names, answers from replay.json, edits kept in memory only. */
 export function makeReplayApi(replay) {
   let queue = [...replay.queue]
@@ -81,7 +91,7 @@ export function makeReplayApi(replay) {
     health: async () => replay.health,
     postTicket: async () => { throw new Error(reason) },
     listTickets: async () => queue,
-    getTicket: async (id) => replay.samples[sampleOf(id)],
+    getTicket: async (id) => replay.samples[sampleOf(id)] || fromQueueRow(queue.find((q) => q.ticket_id === id)),
     review: async (id, body) => {
       if (reviewed[id]) { const e = new Error('Already reviewed'); e.status = 409; throw e }
       const row = queue.find((q) => q.ticket_id === id)

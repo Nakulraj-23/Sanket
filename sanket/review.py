@@ -12,6 +12,7 @@ from sqlalchemy.orm import Session, sessionmaker
 
 from sanket.db import Prediction, Ticket, utcnow
 from sanket.db import Review as ReviewRow
+from sanket.pipeline.pii import redact
 from sanket.schemas import Review, ReviewIn, TicketSummary
 from sanket.taxonomy import INTENTS, team_of, urgency_of
 
@@ -26,6 +27,27 @@ class AlreadyReviewed(RuntimeError):
 
 class BadReview(ValueError):
     """The review request is not valid (unknown intent, missing intent on override)."""
+
+
+MAX_REVIEWER, MAX_NOTE = 64, 1000
+
+
+def safe_text(value: str) -> str:
+    """Join lines into one, then mask personal data, so free text is safe to store and return."""
+    return redact(" ".join(value.split()))[0]
+
+
+def _clean_free_text(body: ReviewIn) -> ReviewIn:
+    """Check and redact the reviewer name and note (422 if the name is empty or too long)."""
+    reviewer = safe_text(body.reviewer)
+    if not reviewer or len(body.reviewer.strip()) > MAX_REVIEWER:
+        raise BadReview(f"reviewer must be 1 to {MAX_REVIEWER} characters")
+    note = body.note
+    if note is not None:
+        if len(note) > MAX_NOTE:
+            raise BadReview(f"note must be at most {MAX_NOTE} characters")
+        note = safe_text(note)
+    return body.model_copy(update={"reviewer": reviewer, "note": note})
 
 
 def _final_values(body: ReviewIn, pred: Prediction) -> tuple[str, str]:
@@ -54,6 +76,7 @@ def save_review(sessions: sessionmaker, ticket_id: int, body: ReviewIn,
 
     Raises TicketNotFound (404), BadReview (422) or AlreadyReviewed (409).
     """
+    body = _clean_free_text(body)
     if body.action == "override" and body.final_intent is not None and body.final_intent not in INTENTS:
         raise BadReview(f"unknown intent: {body.final_intent}")
     with sessions() as session:

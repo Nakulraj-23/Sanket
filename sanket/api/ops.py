@@ -6,7 +6,7 @@ from sqlalchemy import func, select
 
 from sanket.api import queries
 from sanket.db import Ticket
-from sanket.pipeline.clean import clean, validate
+from sanket.pipeline.clean import clean
 from sanket.schemas import (
     CompareIn,
     CompareOut,
@@ -20,7 +20,7 @@ from sanket.schemas import (
     Stage,
     Taxonomy,
 )
-from sanket.service import timed
+from sanket.service import timed, validate_text
 from sanket.stages import build_stages
 from sanket.taxonomy import INTENTS, taxonomy_payload
 
@@ -53,7 +53,7 @@ def taxonomy() -> dict:
 def compare(body: CompareIn, request: Request) -> CompareOut:
     """Run both models on the cleaned text. Nothing is stored."""
     rt = request.app.state.runtime
-    problems = validate(body.text)
+    problems = validate_text(body.text)
     if problems:
         raise HTTPException(status_code=422, detail="; ".join(problems))
     text = clean(body.text).text

@@ -50,3 +50,17 @@ def test_not_redacted(text):
 @pytest.mark.parametrize("text", FALSE_REDACTED)
 def test_amount_not_a_phone(text):
     assert clean(text).pii == {}
+
+
+@pytest.mark.parametrize("text", [
+    "card 4111\n1111\n1111\n1111", "card 4111\t1111\t1111\t1111", "card 4111\r\n1111 1111 1111",
+    "card 4111 1111\u200b1111 1111", "call 98123\n45678", "mail a\u200b@example.com",
+])
+def test_any_whitespace_between_groups(text):
+    assert clean(text).pii
+
+
+def test_lone_surrogate_is_dropped():
+    result = clean("my card\ud800 is lost\udfff")
+    assert result.text == "my card is lost"
+    result.text.encode("utf-8")

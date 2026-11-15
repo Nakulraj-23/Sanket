@@ -259,7 +259,7 @@ Render free web service with the same Dockerfile (sleeps after 15 minutes).
 | 0:55 | Open Explain | "These words pushed the decision. Each number is weight times TF-IDF value, so it is exact, not an estimate." |
 | 1:20 | Chip "message with fake PII", open Clean | "Email, phone and card number are replaced before anything is stored. The card check uses the Luhn algorithm." |
 | 1:45 | Chip "ambiguous", then Review queue, override it | "Low confidence goes to a person. My correction is logged with who and when, and becomes training data." |
-| 2:20 | Chip "Hinglish" | "It is trained on English, so here it is weak. I measured that: [numbers]. The unfamiliar-word rule sends most of these to a human." |
+| 2:20 | Chip "Hinglish" | "It is trained on English, so here it is weak. I measured that: [numbers]. The unfamiliar-word rule sends about 4 in 10 of these to a human (26 of 60), and none were silently sent to the wrong team." |
 | 2:45 | Monitor, "Simulate Hinglish surge" | "PSI and KS compare live tickets with training data. I wrote both in NumPy. Red means look before trusting the model." |
 | 3:15 | Model panel | "Retraining uses the corrections. The gate promotes only if the frozen test score is not worse. This rejected row is a poisoned candidate the gate stopped." |
 | 3:40 | LR-versus-NN table, Code tab of any card | "I also built a PyTorch model and report it honestly against the baseline. And this is the real code behind the card." |

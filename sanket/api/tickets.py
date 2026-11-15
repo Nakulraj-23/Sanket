@@ -14,6 +14,8 @@ router = APIRouter()
 @router.post("/tickets", response_model=TicketResult, status_code=201)
 def create_ticket(body: TicketCreate, request: Request) -> TicketResult:
     """Run the full pipeline on one message and return every stage's output."""
+    if body.channel != "web":
+        raise HTTPException(status_code=422, detail="channel: only 'web' is accepted here")
     try:
         return process_ticket(body.text, body.channel, request.app.state.runtime)
     except InvalidTicket as err:

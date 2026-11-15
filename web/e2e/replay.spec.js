@@ -47,7 +47,28 @@ test('replay mode: monitor scenario turns drift red', async ({ page }) => {
 test('narrow screen: strip scrolls sideways, page does not', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 800 })
   await page.goto('/')
-  await expect(page.getByTestId('card-monitor')).toBeAttached()
+  await page.getByRole('button', { name: 'Fake PII' }).click()
+  await expect(page.getByTestId('card-monitor').locator('.summary')).not.toBeEmpty()
+  await page.getByRole('button', { name: 'Simulate Hinglish surge' }).click()
+  await page.getByTestId('queue-item').first().getByRole('button', { name: 'Review' }).click()
+  await page.getByTestId('card-clean').click()
+  await page.getByTestId('drawer').getByRole('tab', { name: 'Live example' }).click()
+  await page.keyboard.press('Escape')
   const w = await page.evaluate(() => [document.documentElement.scrollWidth, window.innerWidth])
   expect(w[0]).toBeLessThanOrEqual(w[1])
+})
+
+test('replay: every queued ticket opens a review form and can be confirmed', async ({ page }) => {
+  await page.goto('/')
+  const items = page.getByTestId('queue-item')
+  await expect(items.first()).toBeVisible()
+  const n = await items.count()
+  expect(n).toBeGreaterThan(0)
+  test.setTimeout(60000)
+  for (let i = 0; i < Math.min(n, 4); i++) {
+    await items.first().getByRole('button', { name: 'Review' }).click()
+    await page.getByTestId('review-submit').click()
+    await expect(page.getByTestId('review-saved')).toBeVisible()
+    await expect(items).toHaveCount(n - i - 1, { timeout: 5000 })
+  }
 })

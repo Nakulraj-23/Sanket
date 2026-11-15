@@ -1,25 +1,44 @@
 # Deploying SANKET
 
-The API and the web app deploy separately. The web app works without the API (it falls back to
-`web/public/replay.json` and says "Replay"), so deploy the web app even if the API sleeps.
+The API and the web app deploy separately. The web app works without the API (it shows "Replay" and
+uses `web/public/replay.json`), so deploy the web app even if the API sleeps. Steps marked
+(account) need your own account; I could not run them.
 
-## 1. API on Hugging Face Spaces (needs your Hugging Face account)
+## Run it on your own machine first (no account)
+1. `make setup data train train-nn seed` (`make link-torch` is only for this sandbox; train needs torch).
+2. `make serve` starts the API on http://localhost:8000. After `make retrain` promotes a model,
+   restart it: the API loads the champion once at start-up.
+3. In another terminal: `cd web && npm install && VITE_API_URL=http://localhost:8000 npm run dev`.
+   Without `VITE_API_URL` the page is always in Replay mode. `make web` does the same without the variable.
+4. `make replay` rewrites `web/public/replay.json` from the real pipeline.
+
+## 1. API on Hugging Face Spaces (account)
 1. `make space-bundle` writes `dist/space/` (Dockerfile, Space `README.md` with `sdk: docker`, `app_port: 7860`).
-2. On huggingface.co create a new Space, SDK Docker, blank, free CPU. Needs your account.
-3. Push the folder: `cd dist/space && git init && git remote add space https://huggingface.co/spaces/<you>/sanket && git add . && git commit -m "SANKET" && git push space HEAD:main` (needs your access token).
-4. In the Space settings add variable `SANKET_CORS_ORIGINS` = your Vercel address (no trailing slash).
-5. Check `https://<you>-sanket.hf.space/api/health` returns `{"status":"ok",...}`.
-The container seeds a fresh database on every start, so a free Space that sleeps comes back with demo data.
+2. Create a Space at huggingface.co: SDK Docker, blank template, free CPU.
+3. Hugging Face refuses large binary files in plain git. Inside `dist/space` run:
+   `git init && git lfs install && git lfs track "*.joblib" "*.onnx" && git add .gitattributes .`
+   (or upload with `hf upload <you>/sanket dist/space . --repo-type space`).
+4. Commit and push: `git commit -m "SANKET" && git remote add space https://huggingface.co/spaces/<you>/sanket && git push space HEAD:main`.
+   When asked for a password use an access token with write rights (or run `hf auth login` once).
+5. Wait for the build, then open `https://<you>-sanket.hf.space/api/health`. It must show `"status":"ok"`.
+The container seeds a fresh database at every start, so reviews made on the free Space are lost when it restarts.
 
-## 2. Web app on Vercel (needs your Vercel account)
-1. Import the repository, root directory `web`, framework Vite (see `web/vercel.json`).
-2. Environment variable `VITE_API_URL` = the Space address from step 1.5.
-3. Deploy. If the API is asleep the page shows Replay mode and retries every 15 seconds.
+## 2. Web app on Vercel (account)
+1. Import the GitHub repository, root directory `web`, framework Vite (see `web/vercel.json`).
+2. Add environment variable `VITE_API_URL` = the Space address from 1.5 (no trailing slash).
+3. Deploy. Note the address Vercel gives you, for example `https://sanket.vercel.app`.
+4. Back on the Space: Settings, Variables, set `SANKET_CORS_ORIGINS` = that Vercel address (no trailing slash), then restart the Space.
+   Preview deployments have other addresses and stay blocked; use the production address.
+5. `VITE_API_URL` is baked in when the page is built. If you change it, redeploy on Vercel.
 
-## Alternative: Render (needs your Render account)
-Create a Web Service from the repository using the root `Dockerfile`; set `PORT` is provided by Render,
-and set `SANKET_CORS_ORIGINS`. Free instances sleep and are slow to wake; the seed runs at each start.
+## Alternative: Render (account)
+1. New Web Service from the GitHub repository, runtime Docker, the root `Dockerfile`.
+2. Render supplies `PORT`; the Dockerfile uses it. Set `SANKET_CORS_ORIGINS` to the Vercel address.
+3. Free instances sleep and the database is rebuilt at each start, so reviews vanish on restart.
 
-## No account needed
-`make setup link-torch data train seed serve` then `make web` runs everything on your machine.
-`make replay` regenerates `web/public/replay.json` from the real pipeline.
+## Troubleshooting
+- Page says Replay: the API is asleep or `VITE_API_URL` is wrong. Open `<API>/api/health`; wait about a minute for a sleeping Space; the page retries every 15 seconds.
+- Browser console shows a CORS error: `SANKET_CORS_ORIGINS` does not equal the page address exactly (scheme, no trailing slash). Fix it and restart the Space.
+- Replay is empty or old: run `make replay`, commit `web/public/replay.json`, redeploy. If `replay.json` is missing the page cannot show anything offline.
+- Space build fails on a big file: the binary was pushed without LFS (step 1.3).
+- Changed `VITE_API_URL` and nothing happened: redeploy the web app (step 2.5).
