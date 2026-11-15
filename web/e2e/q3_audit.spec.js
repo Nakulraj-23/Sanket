@@ -27,7 +27,6 @@ test('@live screenshot of a live result', async ({ page }) => {
 // Known finding (Q3 MED): once the page is Live it never re-checks health, so the badge keeps
 // saying Live after the API dies. test.fail() flips to a pass-required test once it is fixed.
 test('@live API dies mid-session: badge must leave Live', async ({ page }) => {
-  test.fail()
   test.setTimeout(40000)
   await page.goto('/')
   await expect(page.getByTestId('mode-badge')).toHaveText('Live')

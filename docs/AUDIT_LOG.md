@@ -59,3 +59,37 @@
 - Finding: MED `oov_conf` 0.98 was a hard-coded default.
 - Fix: `train_baseline.choose_oov_conf` picks it on a typo copy of val (seed 1042): smallest human share with silent wrong-team under 1%. Chosen 0.97 (val typos: human 35.6%, silent wrong-team 0.94%); table stored in card.json and `oov_conf` in thresholds.json.
 - Result (test, 10% typos): human 35.4%, silent wrong-team 0.55%; Hinglish 26 of 60 to a human, 0 silent wrong-team (n=60). Test: `test_oov_conf_is_selected_on_val_typos_and_stored`.
+
+## 2026-11-15 B1: whitespace tricks in PII (Q3 HIGH)
+- Finding: a card split by newlines or tabs was stored raw.
+- Evidence: `tests/api/test_audit_q3.py` tab/newline test (was xfail).
+- Fix: `pii.unify_spaces` turns any whitespace and zero-width characters into one space before `redact` and `clean`.
+- Test: `tests/data/test_audit_pii.py::test_any_whitespace_between_groups`; the 35 earlier formats still pass.
+
+## 2026-11-15 B1: lone surrogate (Q3 MED)
+- Finding: an unpaired surrogate in input gave a 500 downstream.
+- Evidence: `test_audit_q3.py::test_lone_surrogate_is_a_clean_error` (was xfail).
+- Fix: `unify_spaces` drops surrogates, so `clean` output is always valid UTF-8.
+- Test: `tests/data/test_audit_pii.py::test_lone_surrogate_is_dropped`.
+
+## B2 fix after Q3 (2026-11-15)
+- Finding: MED model card limit said Hinglish is "mostly sent to a human or misrouted"; measured (n=60): 26 sent to a human, 0 silently wrong team, 1 silently wrong intent, intent accuracy 0.65.
+- Fix: sentence rewritten with those numbers and the small-sample caveat in `train_baseline.py`, `artifacts/models/v1/card.json`, `web/public/replay.json`, `docs/plan/PLAN.md`; the flaky wall-clock test in `test_audit_q2.py` now checks the cached matrix directly plus a best-of-3 relative bound of 3x.
+
+## B4 fixes after Q3 (2026-11-15)
+- Finding: HIGH review `note` and `reviewer` were stored and returned as typed (card, email, phone reached `reviews` and the WAL).
+- Fix: `review.safe_text` joins lines and runs `redact` on both before anything is written or returned; note limit 1,000 characters.
+- Result: card, email and phone in a note are gone from the response, the table and the db, -wal and -shm files. Test: `test_review_safety.py::test_note_and_reviewer_are_redacted_everywhere`.
+
+- Finding: MED an empty or 5,000-character reviewer was accepted, so an override could be unattributable.
+- Fix: reviewer must be 1 to 64 characters after trimming, else 422 (checked in `save_review`).
+- Test: `test_bad_reviewer_is_422` (empty, spaces, 65 characters), `test_long_note_is_422`.
+
+- Finding: MED the ticket cap deleted reviews with old tickets, and `channel: "seed"` from a client escaped the cap.
+- Fix: the cap prunes only unreviewed, non-seed tickets; POST /tickets accepts channel `web` only (seed and scenario are set by code).
+- Result: a reviewed ticket survives 15 later posts at cap 10; seed and scenario channels give 422. Tests: `test_cap_never_deletes_reviewed_tickets`, `test_reserved_channels_refused`.
+
+- Finding: MED a lone surrogate in the text gave an unhandled 500 at insert.
+- Fix: `service.validate_text` refuses text that cannot be encoded (422); /compare uses it too.
+- Not changed: chunked bodies skip the 20 kB header check (text is still limited to 2,000 characters); /health already returns status ok, so the web app can poll it to notice a dead API (B5).
+- DEPLOY.md rewritten with LFS, CORS-after-Vercel, redeploy, local `VITE_API_URL` and troubleshooting.

@@ -42,6 +42,17 @@ def luhn_ok(number: str) -> bool:
     return total % 10 == 0
 
 
+_ZERO_WIDTH = re.compile("[\u200b-\u200d\u2060\ufeff\u00ad]")
+_SURROGATE = re.compile("[\ud800-\udfff]")
+
+
+def unify_spaces(text: str) -> str:
+    """Drop unpaired surrogates and zero-width characters; turn every kind of whitespace into one space."""
+    text = _SURROGATE.sub("", text)
+    text = _ZERO_WIDTH.sub("", text)
+    return re.sub(r"\s+", " ", text)
+
+
 def ascii_digits(text: str) -> str:
     """Turn digits of any script (Devanagari, Arabic-Indic, full-width) into 0-9."""
     return "".join(str(unicodedata.digit(c)) if c.isdecimal() and not c.isascii() else c for c in text)
@@ -102,7 +113,7 @@ def redact(text: str) -> tuple[str, dict[str, int]]:
         counts["ACCOUNT"] += 1
         return match.group(0).replace(match.group(2), "[ACCOUNT]")
 
-    text = ascii_digits(text)
+    text = ascii_digits(unify_spaces(text))
     text = EMAIL_RE.sub(swap_email, text)
     text = EMAIL_AT_RE.sub(swap_email, text)
     text = _mask_cards(text, counts)

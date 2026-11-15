@@ -186,11 +186,14 @@ def prediction_out(rt: Runtime, an: Analysis, latency_ms: float) -> PredictionOu
 
 
 def _enforce_cap(session: Session, limit: int) -> None:
-    """Keep at most `limit` tickets: delete the oldest non-seed ones with their rows."""
+    """Keep at most `limit` tickets: delete the oldest unreviewed non-seed ones with their rows.
+
+    A reviewed ticket is never deleted: its review is the override log and the retraining label.
+    """
     total = session.scalar(select(func.count()).select_from(Ticket)) or 0
     if total <= limit:
         return
-    old = select(Ticket.id).where(Ticket.channel != "seed").order_by(Ticket.created_at, Ticket.id)
+    old = select(Ticket.id).where(Ticket.channel != "seed", Ticket.status != "reviewed").order_by(Ticket.created_at, Ticket.id)
     ids = list(session.scalars(old.limit(total - limit)))
     for table in (Review, Prediction):
         session.execute(delete(table).where(table.ticket_id.in_(ids)))
@@ -218,6 +221,15 @@ def store_ticket(rt: Runtime, channel: str, cleaned, an: Analysis, latency_ms: f
         return ticket.id, when
 
 
+def validate_text(text: str) -> list[str]:
+    """`validate`, plus a refusal of text that cannot be stored (such as a lone surrogate)."""
+    try:
+        text.encode("utf-8")
+    except UnicodeEncodeError:
+        return ["bad_encoding: the message has characters that cannot be read"]
+    return validate(text)
+
+
 def process_ticket(text: str, channel: str = "web", rt: Runtime | None = None,
                    created_at: datetime | None = None) -> TicketResult:
     """Run every stage on one raw ticket, store it, and return the result with its trace.
@@ -225,7 +237,7 @@ def process_ticket(text: str, channel: str = "web", rt: Runtime | None = None,
     Raises InvalidTicket if the text fails validation (nothing is stored then).
     """
     rt = rt or get_runtime()
-    problems, t_ingest = timed(validate, text)
+    problems, t_ingest = timed(validate_text, text)
     if problems:
         raise InvalidTicket(problems)
     cleaned, t_clean = timed(clean, text)

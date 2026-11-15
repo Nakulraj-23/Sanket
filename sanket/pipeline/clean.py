@@ -3,7 +3,7 @@ import re
 import unicodedata
 from dataclasses import dataclass
 
-from sanket.pipeline.pii import redact
+from sanket.pipeline.pii import redact, unify_spaces
 
 MAX_CHARS = 2000
 _PLACEHOLDER = re.compile(r"(\[(?:EMAIL|PHONE|CARD|ACCOUNT)\])")
@@ -42,10 +42,11 @@ def _lower_keep_placeholders(text: str) -> str:
 def clean(text: str) -> CleanResult:
     """Mask personal data, then normalise: NFKC, one space between words, lower-case.
 
-    NFKC runs first so look-alike digits (full-width) cannot slip past the masks.
+    Unpaired surrogates and zero-width characters are dropped and every whitespace kind becomes a space,
+    then NFKC runs so look-alike digits (full-width) cannot slip past the masks.
     Devanagari is kept as is. Running clean twice gives the same text.
     """
-    text = unicodedata.normalize("NFKC", text)
+    text = unicodedata.normalize("NFKC", unify_spaces(text))
     masked, pii = redact(text)
     masked = re.sub(r"\s+", " ", masked).strip()
     masked = _lower_keep_placeholders(masked)

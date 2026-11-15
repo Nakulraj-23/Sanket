@@ -20,6 +20,7 @@ export default function App() {
   const [drift, setDrift] = useState(null)
   const [drawer, setDrawer] = useState(null)
   const [queueVersion, setQueueVersion] = useState(0)
+  const [notice, setNotice] = useState('')
   const replayRef = useRef(null)
 
   const goLive = useCallback((h) => { setApi(liveApi); setHealth(h) }, [])
@@ -41,10 +42,26 @@ export default function App() {
     return () => { dead = true }
   }, [goLive])
 
+  // If the API dies while we are live, fall back to replay and say so.
+  const fallBack = useCallback(async () => {
+    try {
+      const replay = replayRef.current || (await loadReplay())
+      replayRef.current = replay
+      setApi(makeReplayApi(replay)); setHealth(replay.health)
+      setNotice('The API stopped answering, so this page switched to Replay. It will switch back when the API returns.')
+    } catch { setError('The API stopped answering and replay.json could not be loaded.') }
+  }, [])
+
+  useEffect(() => {
+    if (!api || api.mode !== 'live') return undefined
+    const timer = setInterval(async () => { try { await checkHealth() } catch { fallBack() } }, 10000)
+    return () => clearInterval(timer)
+  }, [api, fallBack])
+
   useEffect(() => {
     if (!api || api.mode !== 'replay') return undefined
     const timer = setInterval(async () => {
-      try { goLive(await checkHealth()) } catch { /* stay in replay */ }
+      try { goLive(await checkHealth()); setNotice('') } catch { /* stay in replay */ }
     }, 15000)
     return () => clearInterval(timer)
   }, [api, goLive])
@@ -68,7 +85,10 @@ export default function App() {
     try {
       const r = await getResult()
       setResult(r); light()
-    } catch (e) { setError(e.message) }
+    } catch (e) {
+      if (!e.status && api.mode === 'live') fallBack()
+      else setError(e.message)
+    }
     setBusy(false)
   }
 
@@ -96,6 +116,7 @@ export default function App() {
         </span>
         <span className="ver">model {model}</span>
       </header>
+      {notice && <p className="note" role="status" data-testid="fallback-notice">{notice}</p>}
       {mode === 'replay' && (
         <p className="note" data-testid="replay-note">Replay: recorded results, nothing is saved. Reviews stay in this tab only.</p>
       )}

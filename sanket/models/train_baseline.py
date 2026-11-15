@@ -133,7 +133,7 @@ def package_version(train: pd.DataFrame, val: pd.DataFrame, params: BaselinePara
         "limits": [
             "Team and urgency come from this project's rubric, not from the dataset.",
             "Banking77 labels contain noise; about 8% of sampled train labels were disputed in the data audit.",
-            "English only: Hinglish and Devanagari text is mostly sent to a human or misrouted.",
+            "English only. On the 60-row Hinglish stress set (n=60, a small sample) 26 went to a human, none were silently misrouted to the wrong team, 1 was silently given a wrong intent in the right team, and intent accuracy was 0.65.",
             "Confidence is not perfectly calibrated (see ece in the metrics).",
         ],
         "model_file_mb": round((out_dir / "model.joblib").stat().st_size / 1e6, 2),
