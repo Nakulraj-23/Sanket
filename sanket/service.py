@@ -69,11 +69,13 @@ def load_nn(directory: Path):
 
     The network is only a benchmarked second opinion; the baseline serves every ticket.
     """
+    if not (Path(directory) / "model.onnx").exists():
+        return None
     try:
         from sanket.models.nn.onnx_model import OnnxModel
 
         return OnnxModel(directory)
-    except (ImportError, OSError):
+    except Exception:  # noqa: BLE001 - optional component: onnxruntime raises its own error types
         return None
 
 
