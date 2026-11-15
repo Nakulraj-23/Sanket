@@ -1,4 +1,4 @@
-"""Q3 system audit checks. Strict xfails are known findings (docs/handoffs/Q3.md); they flip when fixed."""
+"""Q3 system audit checks. Strict xfails are open findings (docs/handoffs/Q3.md); they flip when fixed."""
 import json
 from concurrent.futures import ThreadPoolExecutor
 from threading import Barrier
@@ -48,6 +48,14 @@ def test_masked_formats_never_stored(client, raw, secret):
 def test_card_split_by_line_breaks_is_masked(client, sep):
     new_ticket(client, f"card 4012{sep}8888{sep}8888{sep}1881 was stolen")
     assert "4012 8888 8888 1881" not in db_dump(client)
+
+
+
+@pytest.mark.xfail(strict=True, reason="Q3 re-check MED: _ / en-dash / comma between card groups")
+@pytest.mark.parametrize("sep", ["_", "\u2013", ",", " , "])
+def test_card_split_by_punctuation_is_masked(client, sep):
+    new_ticket(client, f"card 4012{sep}8888{sep}8888{sep}1881 was stolen")
+    assert "4012" + sep.lower() + "8888" not in db_dump(client)
 
 
 def test_review_note_is_redacted(client):
