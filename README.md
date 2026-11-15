@@ -9,11 +9,14 @@ Every correction is logged, drift is watched, and a new model replaces the old o
 ![PyTorch](https://img.shields.io/badge/PyTorch-2.15%20(training%20only)-EE4C2C)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.163-009688)
 ![React](https://img.shields.io/badge/React-18.3-61DAFB)
-![Tests](https://img.shields.io/badge/pytest-259%20passed-brightgreen)
+![Tests](https://img.shields.io/badge/pytest-261%20passed-brightgreen)
 [![Live demo](https://img.shields.io/badge/live%20demo-sanket--omega.vercel.app-black?logo=vercel)](https://sanket-omega.vercel.app)
 [![Licence: MIT](https://img.shields.io/badge/licence-MIT-blue)](LICENSE)
 
 **Live demo:** https://sanket-omega.vercel.app (dashboard and API on one free Vercel project). The API is serverless and stateless: each cold start re-seeds a small demo database, so reviews you make may not persist. For a fully reliable showcase use Replay mode or run it locally.
+
+**Jump to:** [In plain words](#in-plain-words) · [Screenshots](#screenshots) · [Quickstart](#quickstart-about-2-minutes-on-a-laptop) · [How it works](#how-it-works) · [Results](#results-test-set-3080-official-banking77-test-messages-never-used-for-training-or-tuning) · [Limitations](#honest-limitations) · [Docs](#docs)
+
 
 **Live demo:** `https://<your-project>.vercel.app` (dashboard) · `https://<your-user>-sanket.hf.space/api/health` (API)
 — placeholders until you deploy; see [docs/DEPLOY.md](docs/DEPLOY.md).
@@ -123,6 +126,7 @@ See [docs/data_card.md](docs/data_card.md).
 | [docs/GLOSSARY.md](docs/GLOSSARY.md) | Every technical term in one plain sentence |
 | [docs/INTERVIEW_GUIDE.md](docs/INTERVIEW_GUIDE.md) ([HTML](docs/INTERVIEW_GUIDE.html)) | Pitch, concepts by hand, 60+ questions, demo script, study plan |
 | [docs/DEPLOY.md](docs/DEPLOY.md) | Run locally, deploy to Hugging Face Spaces and Vercel |
+| [docs/CANDIDATE_HANDBOOK.pdf](docs/CANDIDATE_HANDBOOK.pdf) | **Start here**: the full handbook (what was built, how, every module, testing, JD mapping, 160 interview questions with answers) |
 | [docs/data_card.md](docs/data_card.md) | Data source, splits, caveats |
 | [docs/bench.md](docs/bench.md) | Speed and size benchmark |
 | [docs/EXPERIMENTS.md](docs/EXPERIMENTS.md) | What was tried, including what failed |
@@ -131,3 +135,9 @@ See [docs/data_card.md](docs/data_card.md).
 ## Licence
 
 Code: MIT, see [LICENSE](LICENSE). Data: Banking77, CC-BY-4.0, attribution in `data/raw/SOURCE.md`.
+
+## Author
+
+Built by **[Nakulraj-23](https://github.com/Nakulraj-23)** as a portfolio project for an AI Engineer role.
+It was built with an AI-assisted workflow: the problem, the scope and every design decision are the author's,
+and the AI agents that wrote and audited code are credited in the commit trailers. See [AUTHORS.md](AUTHORS.md).
