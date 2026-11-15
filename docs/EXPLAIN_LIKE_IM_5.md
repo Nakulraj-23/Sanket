@@ -12,7 +12,7 @@ If not, it goes straight back with a note saying what was wrong.
 
 ## 2. The black marker
 
-Some customers write their card number, phone number or email in the letter.
+Some customers write their card number, phone number, email or Aadhaar number in the letter.
 The helper takes a black marker and covers them up, writing [CARD] or [PHONE] instead.
 For card numbers there is a little arithmetic trick that real card numbers always pass.
 If a long number fails the trick, it is probably an order number, so the helper leaves it alone.
