@@ -854,7 +854,7 @@ FROM reviews GROUP BY reviewer ORDER BY n DESC;
 ```
 Run it with `.venv/bin/python -c "import sqlite3; print(sqlite3.connect('sanket.db').execute('''<query>''').fetchall())"`. Bonus: add it to `sanket/sql/metrics.sql` as `-- name: reviews_per_reviewer`.
 
-**Expected.** `[('sim-reviewer', 12, 0.83)]`: the seed's simulated reviewer handled 12 tickets and changed 10. Then review one ticket in the dashboard as "me" and run it again: a second row appears.
+**Expected.** `[('sim-reviewer', 14, 0.79)]`: the seed's simulated reviewer handled 14 tickets and changed 11. Then review one ticket in the dashboard as "me" and run it again: a second row appears.
 
 ---
 
